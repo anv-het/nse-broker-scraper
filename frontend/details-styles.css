@@ -1,0 +1,511 @@
+/* Additional Styles for Broker Details Page */
+
+/* ============ General Styles ============ */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ============ Header ============ */
+.header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5aa0 100%);
+    color: white;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.header h1 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.back-link {
+    color: #ffffff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    transition: background 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============ Section Cards ============ */
+.section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8ecf0;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e8ecf0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, #2c5aa0, #1e3a5f);
+    border-radius: 2px;
+}
+
+/* ============ Info Grid ============ */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    padding: 10px 0;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 15px;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.info-value a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.info-value a:hover {
+    text-decoration: underline;
+}
+
+/* ============ Offices Container ============ */
+.offices-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.office-box {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.office-box h4 {
+    margin: 0 0 15px 0;
+    color: #334155;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.office-box h4::before {
+    content: '📍';
+}
+
+/* ============ Data Tables ============ */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.data-table th {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    color: #475569;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.data-table a:hover {
+    text-decoration: underline;
+}
+
+/* ============ Status Badges ============ */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-enabled {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-disabled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-notenabled {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ============ Management Container ============ */
+.management-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.management-box {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 10px;
+    padding: 25px;
+    border: 1px solid #e2e8f0;
+}
+
+.management-box h4 {
+    margin: 0 0 15px 0;
+    color: #1e3a5f;
+    font-size: 16px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* ============ SEBI Cards ============ */
+.sebi-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.sebi-card {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sebi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sebi-card h4 {
+    margin: 0 0 12px 0;
+    color: #1e3a5f;
+    font-size: 15px;
+}
+
+.sebi-card p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #475569;
+}
+
+.sebi-path {
+    font-size: 12px !important;
+    color: #64748b !important;
+    word-break: break-all;
+}
+
+/* ============ Complaints Grid ============ */
+.complaints-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.complaint-box {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.complaint-box h4 {
+    margin: 0 0 15px 0;
+    color: #334155;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ============ Net Worth Section ============ */
+.networth-highlight {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid #a7f3d0;
+}
+
+.networth-highlight .info-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #047857;
+}
+
+/* ============ Metadata Section ============ */
+.metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+/* ============ Loading & Error States ============ */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.error-message h3 {
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ============ Utility Classes ============ */
+.no-data {
+    color: #94a3b8;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.small-text {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.monospace {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+}
+
+.info-link {
+    color: #2563eb;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.info-link:hover {
+    text-decoration: underline;
+}
+
+.info-link::before {
+    content: '📋';
+}
+
+.website-url {
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.website-url::before {
+    content: '🌐';
+}
+
+.date-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.legend-text {
+    font-size: 12px;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.note-text {
+    font-size: 12px;
+    color: #64748b;
+    background: #fefce8;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border-left: 3px solid #eab308;
+}
+
+/* ============ Disciplinary Sections ============ */
+.disciplinary-subsection {
+    margin-bottom: 25px;
+}
+
+.disciplinary-title {
+    font-size: 15px;
+    color: #475569;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.disclaimer-box {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 12px;
+    color: #92400e;
+}
+
+/* ============ Responsive Adjustments ============ */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header {
+        padding: 15px 20px;
+    }
+    
+    .header h1 {
+        font-size: 20px;
+    }
+    
+    .section {
+        padding: 20px;
+    }
+    
+    .offices-container,
+    .management-container,
+    .complaints-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-table {
+        font-size: 13px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 18px;
+    }
+    
+    .section-title {
+        font-size: 16px;
+    }
+    
+    .networth-highlight .info-value {
+        font-size: 22px;
+    }
+}

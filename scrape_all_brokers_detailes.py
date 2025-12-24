@@ -1,7 +1,7 @@
 import requests
 import os
 import urllib3
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 import json
 import csv
 import time
@@ -10,9 +10,7 @@ import logging
 from pymongo import MongoClient
 import sys
 from datetime import datetime
-
-START_INDEX = 1
-END_INDEX = 100
+import re
 
 # Suppress warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -25,6 +23,9 @@ MONGO_COLLECTION_NAME = "Broker_list_details"
 INPUT_CSV = "nse_members.csv"
 DATA_DIR = "data"
 LOGS_DIR = "logs"
+
+START_INDEX = 1340
+END_INDEX = 1341
 
 # Ensure directories exist
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -61,7 +62,87 @@ def get_mongo_collection():
 def clean_text(text):
     if not text:
         return ""
-    return " ".join(text.split())
+    text = text.replace('\xa0', ' ')
+    return " ".join(text.split()).strip()
+
+def get_cell_data(tr):
+    """Extract key-value pair from a table row."""
+    if not tr or tr.name != "tr":
+        return None, None
+    
+    # Standard case: two direct children
+    cells = tr.find_all(["th", "td"], recursive=False)
+    if len(cells) >= 2:
+        return clean_text(cells[0].get_text()), clean_text(cells[1].get_text())
+    
+    # Malformed case: td nested inside th
+    if len(cells) == 1:
+        th = cells[0]
+        td = th.find("td")
+        if td:
+            # Key is text before td
+            key = ""
+            for c in th.contents:
+                if c == td: break
+                if isinstance(c, Comment): continue
+                if isinstance(c, str): key += c
+                elif hasattr(c, 'get_text'):
+                    key += c.get_text()
+            return clean_text(key), clean_text(td.get_text())
+        return clean_text(th.get_text()), ""
+    
+    return None, None
+
+def get_months_years():
+    """Generate last 6 months in Mon_YYYY format."""
+    today = datetime.now()
+    arr = []
+    for i in range(1, 7):
+        month = today.month - i - 1  # 0-indexed for calculation
+        year = today.year
+        if month < 0:
+            month += 12
+            year -= 1
+        month_name = datetime(year, month + 1, 1).strftime('%b')
+        arr.append(f"{month_name}_{year}")
+    return arr
+
+def get_financial_years():
+    """Generate last 3 financial years."""
+    today = datetime.now()
+    current_year = today.year
+    current_month = today.month
+    if current_month < 4:
+        current_year -= 1
+    
+    years = []
+    for i in range(1, 4):
+        start_year = current_year - i
+        end_year = start_year + 1
+        years.append(f"{start_year}_{end_year}")
+    return years
+
+def get_reporting_periods():
+    """Generate reporting periods for 6-monthly data."""
+    today = datetime.now()
+    current_month = today.month
+    current_year = today.year
+    arr = []
+    if current_month >= 4 and current_month < 10:
+        arr.append(f"MAR {current_year}")
+        arr.append(f"SEP {current_year - 1}")
+        arr.append(f"MAR {current_year - 1}")
+        arr.append(f"SEP {current_year - 2}")
+        arr.append(f"MAR {current_year - 2}")
+        arr.append(f"SEP {current_year - 3}")
+    else:
+        arr.append(f"SEP {current_year}")
+        arr.append(f"MAR {current_year}")
+        arr.append(f"SEP {current_year - 1}")
+        arr.append(f"MAR {current_year - 1}")
+        arr.append(f"SEP {current_year - 2}")
+        arr.append(f"MAR {current_year - 2}")
+    return arr
 
 def sanitize_filename(name):
     """Removes illegal characters from filenames."""
@@ -80,6 +161,7 @@ def parse_table(table):
     
     if not headers and rows:
         first_row_cells = rows[0].find_all(["th", "td"])
+        # Heuristic: if mostly th, assume header
         if any(cell.name == "th" for cell in first_row_cells):
              headers = [clean_text(cell.get_text()) for cell in first_row_cells]
              rows = rows[1:]
@@ -120,6 +202,19 @@ def parse_accordion_content(content_div):
         return all_table_data
     return clean_text(content_div.get_text())
 
+def parse_key_value_table(table):
+    """Parses a table that is essentially a list of Key-Value pairs (Header-Value)."""
+    data = {}
+    rows = table.find_all("tr")
+    for row in rows:
+        cells = row.find_all(["th", "td"])
+        if len(cells) >= 2:
+            key = clean_text(cells[0].get_text())
+            val = clean_text(cells[1].get_text())
+            if key and val:
+                data[key] = val
+    return data
+
 def scrape_broker(broker_data, mongo_collection):
     sr_no = broker_data.get("sr_no")
     member_name = broker_data.get("member_name")
@@ -130,22 +225,17 @@ def scrape_broker(broker_data, mongo_collection):
         logging.warning(f"Skipping {member_name} (Sr: {sr_no}): No details URL.")
         return "FAILED", 0
 
-    # Construct Folder Name: member_name + sr_no + member_code
+    # Construct Folder Name
     folder_name_raw = f"{member_name}_{sr_no}_{member_code}"
     folder_name = sanitize_filename(folder_name_raw)
-    
-    # Target Directory inside DATA_DIR
     target_dir = os.path.join(DATA_DIR, folder_name)
     
-    # Check if already exists
-    if os.path.exists(target_dir):
-        logging.info(f"Skipping {member_name} (Sr: {sr_no}): Already scraped (Folder exists).")
-        return "SKIPPED", 0
+    # Check if already exists (SKIP LOGIC DISABLED FOR RE-SCRAPING ARHAM)
+    # if os.path.exists(target_dir):
+    #     logging.info(f"Skipping {member_name} (Sr: {sr_no}): Already scraped.")
+    #     return "SKIPPED", 0
     
-    # Create Directory
     os.makedirs(target_dir, exist_ok=True)
-    
-    # Base Filename for files inside
     base_filename = folder_name 
 
     logging.info(f"Scraping {member_name} (Sr: {sr_no})...")
@@ -176,8 +266,6 @@ def scrape_broker(broker_data, mongo_collection):
 
     if not success:
         logging.error(f"Failed to scrape {member_name} after {max_retries} attempts.")
-        # Clean up empty directory if failed?
-        # os.rmdir(target_dir) 
         return "FAILED", retries
 
     # Save HTML
@@ -194,7 +282,7 @@ def scrape_broker(broker_data, mongo_collection):
         "meta_url": details_url
     }
 
-    # Inputs
+    # 1. Inputs
     inputs = soup.find_all("input")
     for inp in inputs:
         name = inp.get("name") or inp.get("id")
@@ -202,7 +290,27 @@ def scrape_broker(broker_data, mongo_collection):
         if name and val and val.strip():
             full_data[f"Input_{name}"] = clean_text(val)
 
-    # Accordions
+    # 2. Top Basic Details Table
+    # Look for table containing "Member Name"
+    tables = soup.find_all("table")
+    for table in tables:
+        if "Member Name" in table.get_text() and "SEBI Registration no" in table.get_text():
+            # This is likely the basic details table
+            basic_details = parse_key_value_table(table)
+            full_data["Basic_Details"] = basic_details
+            break
+
+    # 3. Key Management / Compliance Table
+    # Look for table containing "COMPLIANCE OFFICER DETAILS" or "MANAGING DIRECTOR"
+    for table in tables:
+        text = table.get_text()
+        if "COMPLIANCE OFFICER DETAILS" in text or "MANAGING DIRECTOR" in text:
+            # This table is a bit mixed (headers in rows), so parse as key-value
+            kmp_details = parse_key_value_table(table)
+            full_data["Key_Management_Personnel"] = kmp_details
+            # Don't break, there might be multiple such tables or one big one
+
+    # 4. Accordions
     accordions = soup.find_all("div", class_="accordion-item")
     for acc in accordions:
         header = acc.find("div", class_="accordion-header")
@@ -213,7 +321,7 @@ def scrape_broker(broker_data, mongo_collection):
             acc_data = parse_accordion_content(content)
             full_data[key] = acc_data
 
-    # Dropdowns
+    # 5. Dropdowns
     selects = soup.find_all("select")
     dropdown_data = {}
     for sel in selects:
@@ -279,14 +387,11 @@ def main():
     # -----------------------------
 
     logging.info(f"Starting scraping process. Range: {START_INDEX} to {END_INDEX}")
-    logging.info(f"Data Directory: {DATA_DIR}")
-    logging.info(f"Logs Directory: {LOGS_DIR}")
 
     mongo_collection = get_mongo_collection()
     if mongo_collection is None:
         logging.warning("Proceeding without MongoDB connection.")
 
-    # Read CSV
     brokers_to_scrape = []
     if not os.path.exists(INPUT_CSV):
         logging.error(f"Input CSV {INPUT_CSV} not found.")
@@ -319,15 +424,13 @@ def main():
         
         if status == "SUCCESS":
             stats["success"] += 1
-            # Random Delay only if actually scraped
-            delay = random.uniform(1, 12)
+            delay = random.uniform(1, 5)
             logging.info(f"Waiting for {delay:.2f} seconds...")
             time.sleep(delay)
         elif status == "FAILED":
             stats["failed"] += 1
         elif status == "SKIPPED":
             stats["skipped"] += 1
-            # No delay for skipped items
 
     logging.info("="*30)
     logging.info("SCRAPING SUMMARY")

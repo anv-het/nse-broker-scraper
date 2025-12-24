@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broker Details - NSE Broker Directory</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="details-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <button onclick="window.location.href='index.html'" class="btn-back">← Back to List</button>
+                <h1>📋 Broker Details</h1>
+            </div>
+        </header>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading broker details...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <p id="errorText"></p>
+            <button onclick="window.location.href='index.html'" class="btn btn-primary" style="margin-top: 15px;">← Go Back to List</button>
+        </div>
+
+        <!-- Broker Details Content -->
+        <div id="detailsContent" class="details-content" style="display: none;">
+            
+            <!-- Section 1: Basic Information -->
+            <section class="detail-card" id="basicInfoSection">
+                <h2 class="card-title">📊 Basic Information</h2>
+                <div class="info-grid basic-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">MEMBER NAME:</span>
+                        <span class="info-value highlight" id="memberName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">SEBI REGISTRATION NO:</span>
+                        <span class="info-value" id="sebiRegNo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">MEMBER CODE:</span>
+                        <span class="info-value" id="memberCode">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">REGISTRATION DATE:</span>
+                        <span class="info-value" id="regDate">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">TRADE NAME:</span>
+                        <span class="info-value" id="tradeName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">CONSTITUTION:</span>
+                        <span class="info-value" id="constitution">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">YEAR OF INCORPORATION:</span>
+                        <span class="info-value" id="yearIncorporation">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">YEAR OF NSE MEMBERSHIP:</span>
+                        <span class="info-value" id="yearMembership">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Office Addresses -->
+            <section class="detail-card" id="officeSection">
+                <h2 class="card-title">📍 Office Addresses & Contact Details</h2>
+                <div class="offices-container">
+                    <!-- Registered Office -->
+                    <div class="office-box">
+                        <h3 class="office-title">🏢 Registered Office</h3>
+                        <div class="office-details">
+                            <div class="office-row">
+                                <span class="office-label">ADDRESS:</span>
+                                <span class="office-value" id="regAddress">-</span>
+                            </div>
+                            <div class="office-grid">
+                                <div class="office-item">
+                                    <span class="office-label">CITY:</span>
+                                    <span class="office-value" id="regCity">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">PIN CODE:</span>
+                                    <span class="office-value" id="regPincode">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">PHONE:</span>
+                                    <span class="office-value" id="regPhone">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">FAX:</span>
+                                    <span class="office-value" id="regFax">-</span>
+                                </div>
+                            </div>
+                            <div class="office-row">
+                                <span class="office-label">EMAIL:</span>
+                                <span class="office-value" id="regEmail">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Correspondence Office -->
+                    <div class="office-box">
+                        <h3 class="office-title">📬 Correspondence Office</h3>
+                        <div class="office-details">
+                            <div class="office-row">
+                                <span class="office-label">ADDRESS:</span>
+                                <span class="office-value" id="corrAddress">-</span>
+                            </div>
+                            <div class="office-grid">
+                                <div class="office-item">
+                                    <span class="office-label">CITY:</span>
+                                    <span class="office-value" id="corrCity">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">PIN CODE:</span>
+                                    <span class="office-value" id="corrPincode">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">PHONE:</span>
+                                    <span class="office-value" id="corrPhone">-</span>
+                                </div>
+                                <div class="office-item">
+                                    <span class="office-label">FAX:</span>
+                                    <span class="office-value" id="corrFax">-</span>
+                                </div>
+                            </div>
+                            <div class="office-row">
+                                <span class="office-label">EMAIL:</span>
+                                <span class="office-value" id="corrEmail">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Segment Status -->
+            <section class="detail-card" id="segmentSection">
+                <h2 class="card-title">📈 Segment Status</h2>
+                <p class="legend-text" id="segmentLegend"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="segmentTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Segment</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="segmentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 4: Other Details -->
+            <section class="detail-card" id="otherDetailsSection">
+                <h2 class="card-title">📋 Other Details</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">LIST OF APs REGISTERED:</span>
+                        <span class="info-value link-value" id="apList">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">LIST OF DEALING OFFICES:</span>
+                        <span class="info-value link-value" id="dealingOffices">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">LISTED:</span>
+                        <span class="info-value" id="isListed">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">INVESTOR GRIEVANCE EMAIL:</span>
+                        <span class="info-value" id="grievanceEmail">-</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">TYPES OF CLIENTS SERVED:</span>
+                        <span class="info-value" id="clientTypes">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Website & Apps -->
+            <section class="detail-card" id="websiteAppSection">
+                <h2 class="card-title">🌐 Website & Applications</h2>
+                <div class="subsection">
+                    <h3 class="subsection-title">Website</h3>
+                    <p class="website-link" id="websiteAddress">-</p>
+                </div>
+                <div class="subsection" id="appsSubsection">
+                    <h3 class="subsection-title">Mobile Applications</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="appsTable">
+                            <thead>
+                                <tr>
+                                    <th>Sr.No</th>
+                                    <th>App Name</th>
+                                    <th>Play Store</th>
+                                    <th>App Store</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="subsection" id="socialSubsection">
+                    <h3 class="subsection-title">Social Media</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="socialMediaTable">
+                            <thead>
+                                <tr>
+                                    <th>Sr.No</th>
+                                    <th>Platform</th>
+                                    <th>Handle/Link</th>
+                                </tr>
+                            </thead>
+                            <tbody id="socialMediaTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: SEBI Details -->
+            <section class="detail-card" id="sebiDetailsSection">
+                <h2 class="card-title">🏛️ SEBI Registration Details</h2>
+                <div class="sebi-cards" id="sebiCardsContainer">
+                </div>
+            </section>
+
+            <!-- Section 7: Depository Participant Details -->
+            <section class="detail-card" id="depositorySection">
+                <h2 class="card-title">🏦 Depository Participant Details</h2>
+                <p class="section-subtitle" id="depositoryDate"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="depositoryTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Name of Depository</th>
+                                <th>Registration No.</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="depositoryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 8: Stock Exchange Membership -->
+            <section class="detail-card" id="exchangeSection">
+                <h2 class="card-title">📊 Stock Exchange Membership Details</h2>
+                <p class="section-subtitle" id="exchangeDate"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="exchangeTable">
+                        <thead>
+                            <tr>
+                                <th>Sr.No</th>
+                                <th>Name of Exchange</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exchangeTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 9: Key Management Details -->
+            <section class="detail-card" id="managementSection">
+                <h2 class="card-title">👔 Key Management Details</h2>
+                <div class="management-container">
+                    <div class="management-box">
+                        <h3 class="management-title">Managing Director / CEO</h3>
+                        <div class="management-details">
+                            <p><strong>Name:</strong> <span id="ceoName">-</span></p>
+                            <p><strong>Designation:</strong> <span id="ceoDesignation">-</span></p>
+                        </div>
+                    </div>
+                    <div class="management-box">
+                        <h3 class="management-title">Compliance Officer</h3>
+                        <div class="management-details">
+                            <p><strong>Name:</strong> <span id="complianceName">-</span></p>
+                            <p><strong>Email:</strong> <span id="complianceEmail">-</span></p>
+                            <p><strong>Contact:</strong> <span id="complianceContact">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Directors Details -->
+            <section class="detail-card" id="directorsSection">
+                <h2 class="card-title">👥 Directors Details</h2>
+                <p class="section-subtitle" id="directorsDate"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="directorsTable">
+                        <thead>
+                            <tr>
+                                <th>Sr.No</th>
+                                <th>Director Name</th>
+                                <th>Designated Director</th>
+                            </tr>
+                        </thead>
+                        <tbody id="directorsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 11: Complaints Data -->
+            <section class="detail-card" id="complaintsSection">
+                <h2 class="card-title">📝 Complaints & Grievances</h2>
+                
+                <!-- SCORES 2.0 Complaints -->
+                <div class="subsection" id="scoresSubsection">
+                    <h3 class="subsection-title">Details of Complaints received in SCORES 2.0</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="scoresTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Opening Complaints</th>
+                                    <th>Received</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scoresTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <!-- ODR Complaints -->
+                <div class="subsection" id="odrComplaintsSubsection">
+                    <h3 class="subsection-title">ODR – Summary of Complaints received</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="odrComplaintsTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Opening Complaints</th>
+                                    <th>Received</th>
+                                </tr>
+                            </thead>
+                            <tbody id="odrComplaintsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ODR Arbitration -->
+                <div class="subsection" id="odrArbitrationSubsection">
+                    <h3 class="subsection-title">ODR – Summary of Arbitration Cases</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="odrArbitrationTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Opening Complaints</th>
+                                    <th>Received</th>
+                                </tr>
+                            </thead>
+                            <tbody id="odrArbitrationTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- GRC Complaints -->
+                <div class="subsection" id="grcSubsection">
+                    <h3 class="subsection-title">Complaints Closed through GRC (Pre-ODR)</h3>
+                    <p class="note-text" id="grcNote"></p>
+                    <div class="table-responsive">
+                        <table class="data-table" id="grcTable">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Closed</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grcTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Disciplinary Actions -->
+            <section class="detail-card" id="disciplinarySection">
+                <h2 class="card-title">⚠️ Disciplinary Actions</h2>
+                <p class="section-subtitle" id="disciplinaryDate"></p>
+                <div id="disciplinaryContent">
+                </div>
+            </section>
+
+            <!-- Section 12: Associate Companies -->
+            <section class="detail-card" id="associateCompaniesSection">
+                <h2 class="card-title">🏢 Associate Companies</h2>
+                <p class="note-text" id="associateCompaniesNote"></p>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="associateCompaniesTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Company Name</th>
+                                <th>Financial Market Sector</th>
+                                <th>SEBI Registration No</th>
+                            </tr>
+                        </thead>
+                        <tbody id="associateCompaniesTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 13: Trading Member Summary -->
+            <section class="detail-card" id="tradingSummarySection">
+                <h2 class="card-title">📊 Summary of Trading Member Information</h2>
+                <p class="section-subtitle" id="tradingSummaryPeriod"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="tradingSummaryTable">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Branches</th>
+                                <th>Employees</th>
+                                <th>APs</th>
+                                <th>Active Clients</th>
+                                <th>Equity Clients</th>
+                                <th>Derivatives Clients</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradingSummaryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 14: Client Bank Accounts -->
+            <section class="detail-card" id="bankAccountsSection">
+                <h2 class="card-title">🏦 Client Bank Accounts (USCNBA)</h2>
+                <p class="note-text" id="bankAccountsNote"></p>
+                <div class="table-responsive">
+                    <table class="data-table" id="bankAccountsTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Account Name</th>
+                                <th>Account Number</th>
+                                <th>IFSC Code</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bankAccountsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 15: Net Worth -->
+            <section class="detail-card" id="netWorthSection">
+                <h2 class="card-title">💰 Trading Member Net Worth</h2>
+                <div class="networth-container">
+                    <div class="networth-item">
+                        <span class="networth-label">As on Date:</span>
+                        <span class="networth-value" id="networthDate">-</span>
+                    </div>
+                    <div class="networth-item">
+                        <span class="networth-label">Net Worth (Rs.):</span>
+                        <span class="networth-value highlight" id="networthAmount">-</span>
+                    </div>
+                    <div class="networth-item full-width">
+                        <span class="networth-label">Reference:</span>
+                        <span class="networth-value" id="networthRef">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 16: Metadata -->
+            <section class="detail-card metadata-section" id="metadataSection">
+                <h2 class="card-title">🔧 Data Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Sr. No:</span>
+                        <span class="info-value" id="metaSrNo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Scraped At:</span>
+                        <span class="info-value" id="metaScrapedAt">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Scraper Version:</span>
+                        <span class="info-value" id="metaVersion">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Source URL:</span>
+                        <span class="info-value link-value" id="metaUrl">-</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="details.js"></script>
+</body>
+</html>
