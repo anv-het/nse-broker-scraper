@@ -72,19 +72,26 @@ class DashboardController:
             skip = (page - 1) * limit
             
             # Fetch brokers with pagination
-            brokers = list(
-                collection.find(query, {
+            # Use aggregation pipeline to convert sr_no to number and sort properly
+            pipeline = [
+                {"$match": query},
+                {"$addFields": {
+                    "sr_no_numeric": {"$toInt": "$_metadata.sr_no"}
+                }},
+                {"$sort": {"sr_no_numeric": 1}},
+                {"$skip": skip},
+                {"$limit": limit},
+                {"$project": {
                     "_id": 1,
                     "Member Name": 1,
                     "Member Code": 1,
                     "SEBI Registration no": 1,
                     "_metadata": 1,
                     "Basic_Details": 1
-                })
-                .sort("_metadata.sr_no", 1)
-                .skip(skip)
-                .limit(limit)
-            )
+                }}
+            ]
+            
+            brokers = list(collection.aggregate(pipeline))
             
             # Process broker data
             broker_list = []
