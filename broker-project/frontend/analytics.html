@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSE Broker Analytics Dashboard</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>📊 Analytics Dashboard</h1>
+                    <p class="header-subtitle">Broker performance metrics and insights</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab">📋 Broker List</a>
+                <a href="analytics.html" class="nav-tab active">📊 Analytics Dashboard</a>
+            </nav>
+        </header>
+
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBrokers">-</div>
+                <div class="stat-label">Total Brokers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalClients">-</div>
+                <div class="stat-label">Total Active Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgClients">-</div>
+                <div class="stat-label">Avg Clients/Broker</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="citiesCount">-</div>
+                <div class="stat-label">Cities Covered</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label class="form-label">Search Broker</label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="form-input" 
+                        placeholder="Search by broker name..."
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sort By</label>
+                    <select id="sortBy" class="form-select">
+                        <option value="sr_no">Sr No</option>
+                        <option value="member_name">Broker Name</option>
+                        <option value="active_clients" selected>Active Clients</option>
+                        <option value="city">City</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Order</label>
+                    <select id="sortOrder" class="form-select">
+                        <option value="asc">Ascending</option>
+                        <option value="desc" selected>Descending</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        🔍 Apply
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        ✖️ Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner d-none">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading analytics data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="alert alert-error d-none">
+            <span>⚠️</span>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- Analytics Table -->
+        <div id="tableContainer" class="table-container d-none">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th onclick="sortByColumn('sr_no')" style="cursor: pointer;">
+                            Sr No <span id="sort-sr_no">↕️</span>
+                        </th>
+                        <th onclick="sortByColumn('member_name')" style="cursor: pointer;">
+                            Broker Name <span id="sort-member_name">↕️</span>
+                        </th>
+                        <th onclick="sortByColumn('active_clients')" style="cursor: pointer;">
+                            Active Clients <span id="sort-active_clients">↕️</span>
+                        </th>
+                        <th onclick="sortByColumn('city')" style="cursor: pointer;">
+                            City <span id="sort-city">↕️</span>
+                        </th>
+                        <th>Website</th>
+                        <th>CEO Name</th>
+                        <th>Compliance Officer</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="analyticsTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Results Info -->
+        <div id="resultsInfo" class="text-center mt-2 d-none">
+            <p class="text-secondary">
+                Showing <strong id="resultsCount">0</strong> brokers
+            </p>
+        </div>
+    </div>
+
+    <script src="src/pages/AnalyticsDashboard.js"></script>
+</body>
+</html>

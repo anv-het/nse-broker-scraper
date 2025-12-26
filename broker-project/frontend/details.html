@@ -4,8 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Broker Details - NSE Broker Directory</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="details-styles.css">
+    <link rel="stylesheet" href="src/styles.css?v=3">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5aa0 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .back-to-top:active {
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -511,6 +555,32 @@
         </div>
     </div>
 
-    <script src="details.js"></script>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" title="Go to top">
+        ↑
+    </button>
+
+    <script src="src/pages/BrokerDetailsPage.js"></script>
+    <script>
+        // Back to Top Button Functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        // Show/hide button based on scroll position
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+        
+        // Scroll to top when clicked
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
 </body>
 </html>

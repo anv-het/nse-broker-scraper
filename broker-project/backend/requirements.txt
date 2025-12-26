@@ -1,0 +1,16 @@
+# NSE Broker Management System - Backend Requirements
+# Python 3.8+
+
+# Flask Framework
+Flask==3.1.0
+flask-cors==5.0.0
+
+# Database
+pymongo==4.10.1
+
+# Utilities
+python-dotenv==1.0.0
+
+# Development
+pytest==8.3.4
+pytest-cov==6.0.0

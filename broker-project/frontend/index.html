@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSE Broker Dashboard - List View</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header --> 
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>🏢 NSE Broker Dashboard</h1>
+                    <p class="header-subtitle">Complete broker information system</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab active">📋 Broker List</a>
+                <a href="analytics.html" class="nav-tab">📊 Analytics Dashboard</a>
+            </nav>
+        </header>
+
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBrokers">-</div>
+                <div class="stat-label">Total Brokers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="citiesCount">-</div>
+                <div class="stat-label">Cities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgClients">-</div>
+                <div class="stat-label">Avg Active Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completionRate">-</div>
+                <div class="stat-label">Data Completion</div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label class="form-label">Search Brokers</label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="form-input" 
+                        placeholder="Search by name, SEBI reg, or code..."
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Filter by City</label>
+                    <select id="cityFilter" class="form-select">
+                        <option value="">All Cities</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Records Per Page</label>
+                    <select id="limitSelect" class="form-select">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        🔍 Apply Filters
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        ✖️ Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner d-none">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading broker data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="alert alert-error d-none">
+            <span>⚠️</span>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- Broker Table -->
+        <div id="tableContainer" class="table-container d-none">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th onclick="sortByColumn('sr_no')" style="cursor: pointer;">
+                            Sr No <span id="sort-sr_no">↕️</span>
+                        </th>
+                        <th onclick="sortByColumn('member_name')" style="cursor: pointer;">
+                            Member Name <span id="sort-member_name">↕️</span>
+                        </th>
+                        <th>SEBI Registration No</th>
+                        <th>Member Code</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="brokerTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="pagination d-none">
+            <!-- Pagination will be populated here -->
+        </div>
+    </div>
+
+    <script src="src/pages/BrokerDashboard.js"></script>
+</body>
+</html>

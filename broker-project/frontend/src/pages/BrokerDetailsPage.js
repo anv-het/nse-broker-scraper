@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://192.168.119.183:8755/api/v1';
 
 // Get member code from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -26,7 +26,7 @@ async function loadBrokerDetails() {
     showLoading(true);
     
     try {
-        const response = await fetch(`${API_BASE_URL}/broker/${memberCode}`);
+        const response = await fetch(`${API_BASE_URL}/brokers/${memberCode}`);
         const data = await response.json();
         
         if (data.success && data.data) {
@@ -36,7 +36,7 @@ async function loadBrokerDetails() {
         }
     } catch (error) {
         console.error('Error loading broker details:', error);
-        showError('Failed to connect to server. Please make sure the API server is running on port 5000.');
+        showError('Failed to connect to server. Please make sure the API server is running.');
     } finally {
         showLoading(false);
     }

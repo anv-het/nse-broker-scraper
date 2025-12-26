@@ -25,7 +25,7 @@ import random
 import logging
 from pymongo import MongoClient
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import the refined parser
 from parse_broker_refined import parse_broker_details, format_data_as_text, format_data_as_csv
@@ -49,15 +49,16 @@ SAVE_MONGODB = True   # Upload to MongoDB database
 MONGO_URI = "mongodb://sa:963852@192.168.102.120:27017/"
 MONGO_DB_NAME = "WEB_SCRAPING"
 MONGO_COLLECTION_NAME = "Broker_list_details"
+MONGO_MEMBER_LIST_COLLECTION = "Broker_member_list"
 
 # --- File Paths ---
 INPUT_CSV = "nse_members.csv"      # Input CSV with broker list
 DATA_DIR = "data"                  # Directory to save scraped data
 LOGS_DIR = "logs"                  # Directory to save log files
 
-# --- Scraping Range ---
+# --- Scraping Range --- TOTAL : 1377
 START_INDEX = 1       # Start from this broker number
-END_INDEX =  10      # End at this broker number (change to scrape all)
+END_INDEX =  1377      # End at this broker number (change to scrape all)
 
 # --- Request Settings ---
 MAX_RETRIES = 5        # Maximum retry attempts for failed requests
@@ -75,6 +76,9 @@ SKIP_EXISTING = True   # Skip brokers that are already scraped
 # If True, checks for JSON file existence before scraping
 # If False, re-scrapes and overwrites existing data
 
+# --- Data Source ---
+LOAD_FROM_DB = True   # Load broker list from MongoDB instead of CSV
+
 # ============================================================================
 # END OF CONFIGURATION - DO NOT MODIFY BELOW THIS LINE
 # ============================================================================
@@ -86,6 +90,7 @@ class NSEBrokerScraper:
     def __init__(self):
         """Initialize the scraper with configuration."""
         self.mongo_collection = None
+        self.start_time = datetime.now()  # Track start time
         self.stats = {
             "total_processed": 0,
             "success": 0,
@@ -104,8 +109,8 @@ class NSEBrokerScraper:
         # Setup logging
         self._setup_logging()
         
-        # Connect to MongoDB if enabled
-        if SAVE_MONGODB:
+        # Connect to MongoDB if enabled for saving or loading
+        if SAVE_MONGODB or LOAD_FROM_DB:
             self._connect_mongodb()
     
     def _setup_logging(self):
@@ -143,11 +148,13 @@ class NSEBrokerScraper:
             
             db = client[MONGO_DB_NAME]
             self.mongo_collection = db[MONGO_COLLECTION_NAME]
+            self.member_list_collection = db[MONGO_MEMBER_LIST_COLLECTION]
             logging.info(f"✓ Connected to MongoDB: {MONGO_DB_NAME}.{MONGO_COLLECTION_NAME}")
         except Exception as e:
             logging.error(f"✗ Failed to connect to MongoDB: {e}")
             logging.warning("  Continuing without MongoDB connection.")
             self.mongo_collection = None
+            self.member_list_collection = None
     
     @staticmethod
     def sanitize_filename(name):
@@ -348,23 +355,43 @@ class NSEBrokerScraper:
         return "SUCCESS"
     
     def load_brokers(self):
-        """Load broker list from CSV file."""
-        if not os.path.exists(INPUT_CSV):
-            logging.error(f"Input CSV not found: {INPUT_CSV}")
-            return []
-        
-        brokers = []
-        with open(INPUT_CSV, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                try:
-                    sr = int(row.get("sr_no", 0))
-                    if START_INDEX <= sr <= END_INDEX:
-                        brokers.append(row)
-                except ValueError:
-                    continue
-        
-        return brokers
+        """Load broker list from CSV file or MongoDB."""
+        if LOAD_FROM_DB:
+            # Load from MongoDB
+            if not self.member_list_collection:
+                logging.error("MongoDB not connected, cannot load broker list from DB")
+                return []
+            
+            try:
+                # Query brokers within the range
+                brokers = list(self.member_list_collection.find({
+                    "sr_no": {"$gte": START_INDEX, "$lte": END_INDEX}
+                }).sort("sr_no", 1))  # Sort by sr_no ascending
+                
+                logging.info(f"✓ Loaded {len(brokers)} brokers from MongoDB")
+                return brokers
+            except Exception as e:
+                logging.error(f"✗ Failed to load brokers from MongoDB: {e}")
+                return []
+        else:
+            # Load from CSV file
+            if not os.path.exists(INPUT_CSV):
+                logging.error(f"Input CSV not found: {INPUT_CSV}")
+                return []
+            
+            brokers = []
+            with open(INPUT_CSV, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    try:
+                        sr = int(row.get("sr_no", 0))
+                        if START_INDEX <= sr <= END_INDEX:
+                            brokers.append(row)
+                    except ValueError:
+                        continue
+            
+            logging.info(f"✓ Loaded {len(brokers)} brokers from CSV")
+            return brokers
     
     def print_configuration(self):
         """Print current configuration."""
@@ -372,6 +399,7 @@ class NSEBrokerScraper:
         logging.info("-" * 80)
         logging.info(f"  Broker Range: {START_INDEX} to {END_INDEX}")
         logging.info(f"  Skip Existing: {SKIP_EXISTING}")
+        logging.info(f"  Load from DB: {LOAD_FROM_DB}")
         logging.info("")
         logging.info("  Output Formats:")
         logging.info(f"    HTML     : {'✓ Enabled' if SAVE_HTML else '✗ Disabled'}")
@@ -402,22 +430,101 @@ class NSEBrokerScraper:
             if total_attempted > 0 else 0
         )
         
+        # Calculate total time from start to finish
+        total_elapsed = datetime.now() - self.start_time
+        total_time_str = self._format_time(total_elapsed.total_seconds())
+        
+        # Calculate scrap time (total time minus break time)
+        scrap_time_seconds = total_elapsed.total_seconds() - (self.stats['total_break_time'] * 60)
+        scrap_time_str = self._format_time(scrap_time_seconds)
+        
         logging.info("")
         logging.info("=" * 80)
         logging.info("SCRAPING SUMMARY")
         logging.info("=" * 80)
         logging.info(f"Total Processed:      {self.stats['total_processed']}")
         logging.info(f"✓ Successful:         {self.stats['success']}")
-        logging.info(f"✗ Failed:             {self.stats['failed']}")
+        logging.info(f"✗ Failed:             {self.stats['failed']}")  
         logging.info(f"⊘ Skipped:            {self.stats['skipped']}")
         logging.info(f"Total Retry Attempts: {self.stats['total_retries']}")
         logging.info(f"Success Rate:         {success_rate:.2f}%")
         logging.info("")
+        logging.info(f"Total Time (Start to End): {total_time_str}")
+        logging.info(f"Active Scrap Time:     {scrap_time_str}")
         logging.info(f"Long Breaks Taken:    {self.stats['breaks_taken']}")
         logging.info(f"Total Break Time:     {self.stats['total_break_time']:.1f} minutes")
         logging.info("=" * 80)
         logging.info(f"Log file: {self.log_file}")
         logging.info("=" * 80)
+    
+    def get_progress_stats(self, current_index, total_brokers):
+        """Calculate and return progress statistics."""
+        elapsed_time = datetime.now() - self.start_time
+        elapsed_seconds = elapsed_time.total_seconds()
+        
+        # Calculate rates
+        total_attempted = self.stats["total_processed"] - self.stats["skipped"]
+        if total_attempted > 0:
+            avg_time_per_broker = elapsed_seconds / total_attempted
+            remaining_brokers = total_brokers - current_index
+            estimated_remaining_seconds = remaining_brokers * avg_time_per_broker
+            expected_completion = datetime.now() + timedelta(seconds=estimated_remaining_seconds)
+        else:
+            avg_time_per_broker = 0
+            remaining_brokers = total_brokers - current_index
+            estimated_remaining_seconds = 0
+            expected_completion = datetime.now()
+        
+        # Format time displays
+        elapsed_str = self._format_time(elapsed_seconds)
+        remaining_str = self._format_time(estimated_remaining_seconds)
+        completion_str = expected_completion.strftime("%I:%M %p %d-%b-%Y")
+        
+        return {
+            "elapsed_time": elapsed_str,
+            "remaining_time": remaining_str,
+            "expected_completion": completion_str,
+            "remaining_brokers": remaining_brokers,
+            "avg_time_per_broker": avg_time_per_broker
+        }
+    
+    def _format_time(self, seconds):
+        """Format seconds into human readable time string."""
+        if seconds < 60:
+            return f"{seconds:.0f} seconds"
+        elif seconds < 3600:
+            minutes = seconds / 60
+            return f"{minutes:.1f} minutes"
+        else:
+            hours = seconds / 3600
+            return f"{hours:.1f} hours"
+    
+    def print_progress_update(self, current_index, total_brokers):
+        """Print detailed progress update."""
+        if current_index % 10 == 0 or current_index == total_brokers:  # Update every 10 brokers or at end
+            stats = self.get_progress_stats(current_index, total_brokers)
+            
+            logging.info("")
+            logging.info("=" * 80)
+            logging.info("📊 PROGRESS UPDATE")
+            logging.info("=" * 80)
+            logging.info(f"Current Progress:     {current_index}/{total_brokers} brokers")
+            logging.info(f"Total Scrap Time:     {stats['elapsed_time']}")
+            logging.info(f"Expected Time Left:   {stats['remaining_time']}")
+            logging.info(f"Expected Finish At:   {stats['expected_completion']}")
+            logging.info(f"Remaining Brokers:    {stats['remaining_brokers']}")
+            logging.info("")
+            logging.info(f"Success Rate:         {(self.stats['success'] / max(1, self.stats['total_processed'] - self.stats['skipped']) * 100):.1f}%")
+            logging.info(f"Avg Time/Broker:      {stats['avg_time_per_broker']:.1f} seconds")
+            logging.info("=" * 80)
+            logging.info("")
+    
+    def print_compact_progress(self, current_index, total_brokers):
+        """Print compact progress line after each broker."""
+        stats = self.get_progress_stats(current_index, total_brokers)
+        progress_percentage = (current_index / total_brokers * 100)
+        
+        logging.info(f"📊 PROGRESS: [{current_index}/{total_brokers}] | Time: {stats['elapsed_time']} | Left: {stats['remaining_time']} | ETA: {stats['expected_completion']} | Remaining: {stats['remaining_brokers']} | Progress: {progress_percentage:.1f}%")
     
     def take_long_break(self):
         """Take a long break to avoid rate limiting."""
@@ -528,6 +635,12 @@ class NSEBrokerScraper:
                 
             elif status == "SKIPPED":
                 self.stats["skipped"] += 1
+            
+            # Print compact progress after each broker
+            self.print_compact_progress(i, total_brokers)
+            
+            # Print detailed progress update every 10 brokers or at end
+            self.print_progress_update(i, total_brokers)
             
             logging.info("")
         
