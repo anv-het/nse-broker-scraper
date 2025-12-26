@@ -30,8 +30,10 @@ class Settings:
     API_PREFIX: str = "/api/v1"
     CORS_ORIGINS: list = [
         "http://localhost:3000",
+        "http://localhost:5050",
         "http://localhost:5500",
         "http://192.168.119.183:3000",
+        "http://192.168.119.183:5050",
         "http://192.168.119.183:5500",
         "*"  # Allow all origins in development
     ]

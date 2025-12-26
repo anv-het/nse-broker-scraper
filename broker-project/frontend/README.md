@@ -53,9 +53,9 @@ Modern, professional frontend application for managing and analyzing NSE (Nation
    ```powershell
    # Using Python's built-in server
    cd broker-project\frontend
-   python -m http.server 8000
+   python -m http.server 5050 --bind 192.168.119.183
    ```
-   - Then navigate to: `http://localhost:8000`
+   - Then navigate to: `http://192.168.119.183:5050`
 
 ### Quick Start
 

@@ -315,7 +315,7 @@ MAX_PAGE_SIZE=200
 SEARCH_LIMIT=100
 
 # CORS Configuration
-CORS_ORIGINS=http://localhost:8000,http://192.168.119.183:8000
+CORS_ORIGINS=http://localhost:5050,http://192.168.119.183:5050
 ```
 
 ### Settings Configuration
@@ -333,7 +333,7 @@ MAX_PAGE_SIZE = 200
 SEARCH_LIMIT = 100
 
 # CORS Settings
-CORS_ORIGINS = ["http://localhost:8000", "http://192.168.119.183:8000"]
+CORS_ORIGINS = ["http://localhost:5050", "http://192.168.119.183:5050"]
 ```
 
 ### Database Configuration
