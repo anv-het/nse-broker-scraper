@@ -4,8 +4,8 @@
   "description": "NSE Broker Data Management System - Frontend",
   "main": "index.html",
   "scripts": {
-    "dev": "python -m http.server 5010 --bind 192.168.119.183",
-    "start": "python -m http.server 5010 --bind 192.168.119.183",
+    "dev": "python -m http.server 5050 --bind 192.168.119.183",
+    "start": "python -m http.server 5050 --bind 192.168.119.183",
     "backend": "cd ../backend && python run_server.py"
   },
   "keywords": ["nse", "broker", "dashboard"],
