@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorized Persons - NSE Broker Directory</title>
+    <link rel="stylesheet" href="src/styles.css?v=3">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+    <style>
+        /* Additional styles for AP table page */
+        .ap-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ap-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .ap-header .broker-info {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .filter-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .filter-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #764ba2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-summary {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .ap-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .ap-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ap-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .ap-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            vertical-align: top;
+            color: #1f2937;
+        }
+        
+        .ap-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .segments-list {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .entity-type {
+            background-color: #ddd6fe;
+            color: #6b46c1;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .contact-info {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .contact-email {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .contact-email:hover {
+            text-decoration: underline;
+            color: #5568d3;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pagination-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #1f2937;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .ap-table {
+                font-size: 0.85rem;
+            }
+            
+            .ap-table th,
+            .ap-table td {
+                padding: 10px 12px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .ap-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        /* Table responsive scroll */
+        .table-scroll-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .export-btn {
+            padding: 12px 24px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <button onclick="goBack()" class="btn-back">← Back to Broker Details</button>
+                <h1>👥 Authorized Persons</h1>
+            </div>
+        </header>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading authorized persons data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <p id="errorText"></p>
+            <button onclick="goBack()" class="btn btn-primary" style="margin-top: 15px;">← Go Back</button>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" style="display: none;">
+            <!-- Broker Info Header -->
+            <div class="ap-header">
+                <h1 id="brokerName">Loading...</h1>
+                <div class="broker-info">
+                    <span id="memberCode">-</span> | 
+                    <span id="totalAPs">-</span> Authorized Persons
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search by Name:</label>
+                        <input type="text" id="searchName" class="filter-input" placeholder="Enter person name...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by City:</label>
+                        <select id="cityFilter" class="filter-input">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by State:</label>
+                        <select id="stateFilter" class="filter-input">
+                            <option value="">All States</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by Status:</label>
+                        <select id="statusFilter" class="filter-input">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button onclick="applyFilters()" class="filter-button">Apply Filters</button>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button onclick="clearFilters()" class="filter-button" style="background: #6c757d;">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="export-buttons">
+                <button onclick="exportToCSV()" class="export-btn">📊 Export to CSV</button>
+                <button onclick="exportToJSON()" class="export-btn">📄 Export to JSON</button>
+            </div>
+
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <strong>Results:</strong> Showing <span id="resultCount">-</span> of <span id="totalCount">-</span> authorized persons
+            </div>
+
+            <!-- Table Container -->
+            <div class="ap-table-container">
+                <div class="table-scroll-container">
+                    <table class="ap-table" id="apTable">
+                        <thead>
+                            <tr>
+                                <th>Sr. No</th>
+                                <th>Name</th>
+                                <th>Trade Name</th>
+                                <th>Registration No.</th>
+                                <th>Registration Date</th>
+                                <th>Entity Type</th>
+                                <th>Contact Person</th>
+                                <th>Contact Details</th>
+                                <th>Location</th>
+                                <th>Segments</th>
+                                <th>Status</th>
+                                <th>Terminals</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfo">
+                        Page 1 of 1 (0 records)
+                    </div>
+                    <div class="pagination-controls" id="paginationControls">
+                        <button class="pagination-btn" onclick="previousPage()" id="prevBtn" disabled>Previous</button>
+                        <button class="pagination-btn" onclick="nextPage()" id="nextBtn" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let memberCode = '';
+        let brokerData = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get member code from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            memberCode = urlParams.get('memberCode');
+            
+            if (!memberCode) {
+                showError('No member code provided');
+                return;
+            }
+            
+            loadAuthorizedPersons();
+        });
+
+        // Load authorized persons data
+        async function loadAuthorizedPersons() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`http://192.168.119.183:8758/api/v1/brokers/${memberCode}/auth-persons`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load data');
+                }
+                
+                brokerData = result.data;
+                currentData = brokerData.authorized_persons || [];
+                filteredData = [...currentData];
+                
+                displayBrokerInfo();
+                populateFilters();
+                displayTable();
+                
+                showLoading(false);
+                document.getElementById('mainContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load authorized persons data: ' + error.message);
+                showLoading(false);
+            }
+        }
+
+        // Display broker information
+        function displayBrokerInfo() {
+            document.getElementById('brokerName').textContent = brokerData.broker_name || 'Unknown Broker';
+            document.getElementById('memberCode').textContent = `Member Code: ${brokerData.member_code}`;
+            document.getElementById('totalAPs').textContent = `${currentData.length}`;
+        }
+
+        // Populate filter options
+        function populateFilters() {
+            const cities = [...new Set(currentData.map(ap => ap.city).filter(city => city))].sort();
+            const states = [...new Set(currentData.map(ap => ap.state).filter(state => state))].sort();
+            
+            const citySelect = document.getElementById('cityFilter');
+            const stateSelect = document.getElementById('stateFilter');
+            
+            citySelect.innerHTML = '<option value="">All Cities</option>';
+            stateSelect.innerHTML = '<option value="">All States</option>';
+            
+            cities.forEach(city => {
+                citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+            });
+            
+            states.forEach(state => {
+                stateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const nameFilter = document.getElementById('searchName').value.toLowerCase();
+            const cityFilter = document.getElementById('cityFilter').value;
+            const stateFilter = document.getElementById('stateFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredData = currentData.filter(ap => {
+                const nameMatch = !nameFilter || 
+                    ap.authorised_person_name.toLowerCase().includes(nameFilter) ||
+                    ap.authorized_person_trade_name.toLowerCase().includes(nameFilter) ||
+                    ap.ap_contact_person_name.toLowerCase().includes(nameFilter);
+                
+                const cityMatch = !cityFilter || ap.city === cityFilter;
+                const stateMatch = !stateFilter || ap.state === stateFilter;
+                const statusMatch = !statusFilter || ap.status === statusFilter;
+                
+                return nameMatch && cityMatch && stateMatch && statusMatch;
+            });
+            
+            currentPage = 1;
+            displayTable();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('cityFilter').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            
+            filteredData = [...currentData];
+            currentPage = 1;
+            displayTable();
+        }
+
+        // Display table data
+        function displayTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            const tbody = document.getElementById('apTableBody');
+            tbody.innerHTML = '';
+            
+            pageData.forEach((ap, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ap.sr_no}</td>
+                    <td><strong>${ap.authorised_person_name}</strong></td>
+                    <td>${ap.authorized_person_trade_name}</td>
+                    <td>${ap.registration_no}</td>
+                    <td>${ap.registration_date}</td>
+                    <td><span class="entity-type">${ap.type_of_entity}</span></td>
+                    <td>${ap.ap_contact_person_name}</td>
+                    <td class="contact-info">
+                        ${ap.ap_email_id ? `<a href="mailto:${ap.ap_email_id}" class="contact-email">${ap.ap_email_id}</a><br>` : ''}
+                        ${ap.contact_no && ap.contact_no !== '00000000' ? `📞 ${ap.contact_no}` : 'No phone'}
+                    </td>
+                    <td>
+                        ${ap.address}<br>
+                        <strong>${ap.city}, ${ap.state}</strong><br>
+                        PIN: ${ap.pincode}
+                    </td>
+                    <td class="segments-list">${ap.traded_segments}</td>
+                    <td><span class="status-badge ${ap.status === 'Active' ? 'status-active' : 'status-inactive'}">${ap.status}</span></td>
+                    <td>${ap.number_of_terminals}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            updateResultsInfo();
+            updatePagination();
+        }
+
+        // Update results summary
+        function updateResultsInfo() {
+            document.getElementById('resultCount').textContent = filteredData.length;
+            document.getElementById('totalCount').textContent = currentData.length;
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const startRecord = ((currentPage - 1) * itemsPerPage) + 1;
+            const endRecord = Math.min(currentPage * itemsPerPage, filteredData.length);
+            
+            document.getElementById('paginationInfo').textContent = 
+                `Page ${currentPage} of ${totalPages} (${startRecord}-${endRecord} of ${filteredData.length} records)`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        // Pagination functions
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayTable();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayTable();
+            }
+        }
+
+        // Export functions
+        function exportToCSV() {
+            const headers = ['Sr_No', 'Name', 'Trade_Name', 'Registration_No', 'Registration_Date', 
+                           'Entity_Type', 'Contact_Person', 'Email', 'Phone', 'Address', 'City', 
+                           'State', 'Pincode', 'Segments', 'Status', 'Terminals'];
+            
+            const csvData = filteredData.map(ap => [
+                ap.sr_no,
+                ap.authorised_person_name,
+                ap.authorized_person_trade_name,
+                ap.registration_no,
+                ap.registration_date,
+                ap.type_of_entity,
+                ap.ap_contact_person_name,
+                ap.ap_email_id,
+                ap.contact_no,
+                ap.address,
+                ap.city,
+                ap.state,
+                ap.pincode,
+                ap.traded_segments,
+                ap.status,
+                ap.number_of_terminals
+            ]);
+            
+            const csvContent = [headers.join(','), ...csvData.map(row => row.join(','))].join('\n');
+            downloadFile(csvContent, `authorized_persons_${memberCode}.csv`, 'text/csv');
+        }
+
+        function exportToJSON() {
+            const jsonContent = JSON.stringify({
+                broker_name: brokerData.broker_name,
+                member_code: brokerData.member_code,
+                total_count: filteredData.length,
+                authorized_persons: filteredData
+            }, null, 2);
+            
+            downloadFile(jsonContent, `authorized_persons_${memberCode}.json`, 'application/json');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'flex' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function goBack() {
+            // Try to go back in browser history
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback to details page
+                window.location.href = `details.html?member_code=${memberCode}`;
+            }
+        }
+
+        // Add search on Enter key
+        document.getElementById('searchName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>

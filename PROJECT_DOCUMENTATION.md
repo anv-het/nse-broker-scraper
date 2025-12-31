@@ -30,7 +30,9 @@ The NSE Broker Management System is a comprehensive web application that provide
 - **📊 Dashboard**: Paginated broker list with search and city filtering
 - **📈 Analytics**: Comprehensive broker analytics and performance metrics
 - **🔍 Detailed Profiles**: Complete broker information including management, trading segments, and financial data
-- **🔎 Advanced Search**: Multi-field search across broker names, SEBI registrations, and member codes
+- **� Auth Person Data**: Authorized person information for each broker
+- **🏢 Branch Office Data**: Dealing office and branch location details
+- **�🔎 Advanced Search**: Multi-field search across broker names, SEBI registrations, and member codes
 - **📱 Responsive Design**: Modern, mobile-friendly web interface
 - **⚡ High Performance**: Optimized for handling 1,377+ broker records
 - **🔒 Production Ready**: Robust error handling, logging, and monitoring
@@ -39,6 +41,8 @@ The NSE Broker Management System is a comprehensive web application that provide
 - **Regulatory Compliance**: Access to verified NSE broker information
 - **Market Intelligence**: Comprehensive broker analytics and comparisons
 - **Due Diligence**: Detailed broker profiles for investment decisions
+- **Authorized Person Tracking**: Complete auth person data for compliance
+- **Branch Network Analysis**: Geographic distribution of broker offices
 - **Research Tools**: Advanced filtering and search capabilities
 
 ---

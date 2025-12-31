@@ -10,6 +10,7 @@ from typing import Dict, Any
 import logging
 
 from ..controllers import dashboard_controller, broker_controller
+from ..controllers import get_broker_auth_person, get_broker_branch
 from ..config import settings
 
 # Configure logging
@@ -218,6 +219,319 @@ def search_brokers():
         }), 400
     except Exception as e:
         logger.error(f"Error in search_brokers: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+# ============================================================================
+# AUTH PERSON ROUTES
+# ============================================================================
+
+@api_router.route('/brokers/<member_code>/auth-persons', methods=['GET'])
+def get_broker_auth_persons_by_member_code(member_code):
+    """
+    Get authorized person data for a specific broker by member code.
+    
+    Path Parameters:
+        - member_code: Broker's member code
+    
+    Returns:
+        JSON response with auth person data
+    """
+    try:
+        result = get_broker_auth_person.get_auth_person_by_member_code(member_code)
+        return jsonify(result), 200 if result.get('success') else 404
+        
+    except Exception as e:
+        logger.error(f"Error in get_broker_auth_persons_by_member_code: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/brokers/mem-id/<mem_id>/auth-persons', methods=['GET'])
+def get_broker_auth_persons_by_mem_id(mem_id):
+    """
+    Get authorized person data for a specific broker by mem_id.
+    
+    Path Parameters:
+        - mem_id: Broker's internal mem_id
+    
+    Returns:
+        JSON response with auth person data
+    """
+    try:
+        result = get_broker_auth_person.get_auth_person_by_mem_id(mem_id)
+        return jsonify(result), 200 if result.get('success') else 404
+        
+    except Exception as e:
+        logger.error(f"Error in get_broker_auth_persons_by_mem_id: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/auth-persons', methods=['GET'])
+def get_all_auth_persons():
+    """
+    Get paginated list of all authorized person data.
+    
+    Query Parameters:
+        - page: Page number (default: 1)
+        - limit: Records per page (default: 50)
+    
+    Returns:
+        JSON response with paginated auth person data
+    """
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 50))
+        
+        result = get_broker_auth_person.get_all_auth_persons(page, limit)
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid parameters: {str(e)}"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error in get_all_auth_persons: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/auth-persons/search', methods=['GET'])
+def search_auth_persons():
+    """
+    Search authorized person data.
+    
+    Query Parameters:
+        - q: Search query (required)
+        - limit: Maximum results (default: 20)
+    
+    Returns:
+        JSON response with matching auth person data
+    """
+    try:
+        search_query = request.args.get('q')
+        limit = int(request.args.get('limit', 20))
+        
+        if not search_query:
+            return jsonify({
+                "success": False,
+                "error": "Search query 'q' is required"
+            }), 400
+        
+        result = get_broker_auth_person.search_auth_persons(search_query, limit)
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid parameters: {str(e)}"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error in search_auth_persons: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/auth-persons/statistics', methods=['GET'])
+def get_auth_person_stats():
+    """
+    Get statistics about authorized person data.
+    
+    Returns:
+        JSON response with auth person statistics
+    """
+    try:
+        result = get_broker_auth_person.get_auth_person_statistics()
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except Exception as e:
+        logger.error(f"Error in get_auth_person_stats: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+# ============================================================================
+# BRANCH/DEALING OFFICE ROUTES
+# ============================================================================
+
+@api_router.route('/brokers/<member_code>/branches', methods=['GET'])
+def get_broker_branches_by_member_code(member_code):
+    """
+    Get dealing office data for a specific broker by member code.
+    
+    Path Parameters:
+        - member_code: Broker's member code
+    
+    Returns:
+        JSON response with branch office data
+    """
+    try:
+        result = get_broker_branch.get_branch_by_member_code(member_code)
+        return jsonify(result), 200 if result.get('success') else 404
+        
+    except Exception as e:
+        logger.error(f"Error in get_broker_branches_by_member_code: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/brokers/mem-id/<mem_id>/branches', methods=['GET'])
+def get_broker_branches_by_mem_id(mem_id):
+    """
+    Get dealing office data for a specific broker by mem_id.
+    
+    Path Parameters:
+        - mem_id: Broker's internal mem_id
+    
+    Returns:
+        JSON response with branch office data
+    """
+    try:
+        result = get_broker_branch.get_branch_by_mem_id(mem_id)
+        return jsonify(result), 200 if result.get('success') else 404
+        
+    except Exception as e:
+        logger.error(f"Error in get_broker_branches_by_mem_id: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/branches', methods=['GET'])
+def get_all_branches():
+    """
+    Get paginated list of all dealing office data.
+    
+    Query Parameters:
+        - page: Page number (default: 1)
+        - limit: Records per page (default: 50)
+    
+    Returns:
+        JSON response with paginated branch office data
+    """
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 50))
+        
+        result = get_broker_branch.get_all_branches(page, limit)
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid parameters: {str(e)}"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error in get_all_branches: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/branches/search', methods=['GET'])
+def search_branches():
+    """
+    Search dealing office data.
+    
+    Query Parameters:
+        - q: Search query (required)
+        - limit: Maximum results (default: 20)
+    
+    Returns:
+        JSON response with matching branch office data
+    """
+    try:
+        search_query = request.args.get('q')
+        limit = int(request.args.get('limit', 20))
+        
+        if not search_query:
+            return jsonify({
+                "success": False,
+                "error": "Search query 'q' is required"
+            }), 400
+        
+        result = get_broker_branch.search_branches(search_query, limit)
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid parameters: {str(e)}"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error in search_branches: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/branches/city/<city>', methods=['GET'])
+def get_branches_by_city(city):
+    """
+    Get dealing offices filtered by city.
+    
+    Path Parameters:
+        - city: City name
+    
+    Query Parameters:
+        - limit: Maximum results (default: 50)
+    
+    Returns:
+        JSON response with branch office data for the specified city
+    """
+    try:
+        limit = int(request.args.get('limit', 50))
+        
+        result = get_broker_branch.get_branches_by_city(city, limit)
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid parameters: {str(e)}"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error in get_branches_by_city: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
+
+
+@api_router.route('/branches/statistics', methods=['GET'])
+def get_branch_stats():
+    """
+    Get statistics about dealing office data.
+    
+    Returns:
+        JSON response with branch office statistics
+    """
+    try:
+        result = get_broker_branch.get_branch_statistics()
+        return jsonify(result), 200 if result.get('success') else 500
+        
+    except Exception as e:
+        logger.error(f"Error in get_branch_stats: {e}")
         return jsonify({
             "success": False,
             "error": "Internal server error"

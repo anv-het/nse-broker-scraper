@@ -18,6 +18,48 @@ class BrokerController:
     """Controller for broker-specific operations."""
     
     @staticmethod
+    def _get_latest_period_data(data_by_period: Dict) -> tuple:
+        """
+        Helper method to get the chronologically latest period data.
+        
+        Args:
+            data_by_period: Dictionary of period data (e.g., "SEP 2025": {...})
+            
+        Returns:
+            tuple: (period_key, period_data) of the most recent period
+        """
+        if not data_by_period:
+            return None, {}
+        
+        # Create sortable dates from period keys
+        periods_with_dates = []
+        for period_key in data_by_period.keys():
+            parts = period_key.split()
+            if len(parts) == 2:
+                month_str, year_str = parts
+                # Convert month to number
+                month_map = {
+                    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+                    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12
+                }
+                month_num = month_map.get(month_str, 1)
+                try:
+                    year_num = int(year_str)
+                    sort_date = year_num * 100 + month_num
+                    periods_with_dates.append((sort_date, period_key))
+                except ValueError:
+                    periods_with_dates.append((0, period_key))
+        
+        if not periods_with_dates:
+            return None, {}
+        
+        # Sort by date (most recent first)
+        periods_with_dates.sort(key=lambda x: x[0], reverse=True)
+        latest_period_key = periods_with_dates[0][1]
+        
+        return latest_period_key, data_by_period.get(latest_period_key, {})
+    
+    @staticmethod
     def get_broker_details(member_code: str) -> Dict[str, Any]:
         """
         Get complete broker details by member code.
@@ -107,18 +149,15 @@ class BrokerController:
                 summary_info = broker.get("summary_trading_member_info", {})
                 data_by_period = summary_info.get("Data_By_Period", {})
                 if data_by_period:
-                    # Get latest period (last key in dictionary)
-                    periods = list(data_by_period.keys())
-                    if periods:
-                        latest_period = periods[-1]
-                        period_data = data_by_period[latest_period]
-                        if isinstance(period_data, dict):
-                            try:
-                                active_clients = int(
-                                    period_data.get("Total_number_of_active_clients", 0)
-                                )
-                            except (ValueError, TypeError):
-                                active_clients = 0
+                    # Get chronologically latest period
+                    latest_period_key, latest_period_data = BrokerController._get_latest_period_data(data_by_period)
+                    if latest_period_data:
+                        try:
+                            active_clients = int(
+                                latest_period_data.get("Total_number_of_active_clients", 0)
+                            )
+                        except (ValueError, TypeError):
+                            active_clients = 0
                 
                 # Extract city
                 city = broker.get("Registered_Office", {}).get("City", "-")
@@ -191,23 +230,62 @@ class BrokerController:
                     "data": []
                 }
             
-            # Aggregate to get top brokers
+            # Aggregate to get top brokers with chronologically latest period
             pipeline = [
                 {"$match": {"summary_trading_member_info.Data_By_Period": {"$exists": True}}},
                 {"$project": {
                     "member_name": "$Member Name",
                     "member_code": "$Member Code",
                     "city": "$Registered_Office.City",
-                    "latest_period": {"$arrayElemAt": [
-                        {"$objectToArray": "$summary_trading_member_info.Data_By_Period"}, -1
-                    ]}
+                    "periods_array": {"$objectToArray": "$summary_trading_member_info.Data_By_Period"}
+                }},
+                {"$unwind": "$periods_array"},
+                {"$addFields": {
+                    "period_key": "$periods_array.k",
+                    "period_data": "$periods_array.v",
+                    # Create a sortable date field from period key (e.g., "SEP 2025" -> 202509)
+                    "sort_date": {
+                        "$add": [
+                            {"$multiply": [
+                                {"$toInt": {"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 1]}}, 
+                                100
+                            ]},
+                            {"$switch": {
+                                "branches": [
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JAN"]}, "then": 1},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "FEB"]}, "then": 2},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "MAR"]}, "then": 3},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "APR"]}, "then": 4},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "MAY"]}, "then": 5},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JUN"]}, "then": 6},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JUL"]}, "then": 7},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "AUG"]}, "then": 8},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "SEP"]}, "then": 9},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "OCT"]}, "then": 10},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "NOV"]}, "then": 11},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "DEC"]}, "then": 12}
+                                ],
+                                "default": 1
+                            }}
+                        ]
+                    }
+                }},
+                {"$sort": {"_id": 1, "sort_date": -1}},
+                {"$group": {
+                    "_id": "$_id",
+                    "member_name": {"$first": "$member_name"},
+                    "member_code": {"$first": "$member_code"},
+                    "city": {"$first": "$city"},
+                    "latest_period_data": {"$first": "$period_data"},
+                    "latest_period_key": {"$first": "$period_key"}
                 }},
                 {"$project": {
                     "member_name": 1,
                     "member_code": 1,
                     "city": 1,
+                    "latest_period": "$latest_period_key",
                     "active_clients": {"$toInt": {
-                        "$ifNull": ["$latest_period.v.Total_number_of_active_clients", "0"]
+                        "$ifNull": ["$latest_period_data.Total_number_of_active_clients", "0"]
                     }}
                 }},
                 {"$sort": {"active_clients": -1}},

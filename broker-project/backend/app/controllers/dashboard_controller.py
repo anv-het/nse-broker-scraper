@@ -154,23 +154,60 @@ class DashboardController:
             cities = collection.distinct("Registered_Office.City")
             cities_count = len([c for c in cities if c])
             
-            # Calculate average active clients
+            # Calculate average active clients - Get most recent period chronologically
             pipeline = [
                 {"$match": {"summary_trading_member_info.Data_By_Period": {"$exists": True}}},
                 {"$project": {
-                    "latest_period": {"$arrayElemAt": [
-                        {"$objectToArray": "$summary_trading_member_info.Data_By_Period"}, -1
-                    ]}
+                    "periods_array": {"$objectToArray": "$summary_trading_member_info.Data_By_Period"}
+                }},
+                {"$unwind": "$periods_array"},
+                {"$addFields": {
+                    "period_key": "$periods_array.k",
+                    "period_data": "$periods_array.v",
+                    # Create a sortable date field from period key (e.g., "SEP 2025" -> 202509)
+                    "sort_date": {
+                        "$add": [
+                            {"$multiply": [
+                                {"$toInt": {"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 1]}}, 
+                                100
+                            ]},
+                            {"$switch": {
+                                "branches": [
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JAN"]}, "then": 1},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "FEB"]}, "then": 2},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "MAR"]}, "then": 3},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "APR"]}, "then": 4},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "MAY"]}, "then": 5},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JUN"]}, "then": 6},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "JUL"]}, "then": 7},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "AUG"]}, "then": 8},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "SEP"]}, "then": 9},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "OCT"]}, "then": 10},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "NOV"]}, "then": 11},
+                                    {"case": {"$eq": [{"$arrayElemAt": [{"$split": ["$periods_array.k", " "]}, 0]}, "DEC"]}, "then": 12}
+                                ],
+                                "default": 1
+                            }}
+                        ]
+                    }
+                }},
+                {"$sort": {"_id": 1, "sort_date": -1}},
+                {"$group": {
+                    "_id": "$_id",
+                    "latest_period_data": {"$first": "$period_data"},
+                    "latest_period_key": {"$first": "$period_key"}
                 }},
                 {"$project": {
                     "active_clients": {"$toInt": {
-                        "$ifNull": ["$latest_period.v.Total_number_of_active_clients", "0"]
-                    }}
+                        "$ifNull": ["$latest_period_data.Total_number_of_active_clients", "0"]
+                    }},
+                    "latest_period": "$latest_period_key"
                 }},
                 {"$group": {
                     "_id": None,
                     "avg_clients": {"$avg": "$active_clients"},
-                    "total_clients": {"$sum": "$active_clients"}
+                    "total_clients": {"$sum": "$active_clients"},
+                    "sample_latest_periods": {"$push": "$latest_period"}
                 }}
             ]
             

@@ -3,3 +3,6 @@ data/
 logs/
 __pycache__/
 frontend/node_modules/
+
+scraper/test/data/
+scraper/auth_person_branch_data/

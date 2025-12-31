@@ -1,9 +1,9 @@
 {
   "info": {
     "name": "NSE Broker Management System API",
-    "description": "Complete API collection for NSE Broker Management System\n\nThis collection contains all REST API endpoints for managing NSE broker data including:\n- Dashboard operations (broker list, stats, filters)\n- Analytics data (broker analytics, top brokers)\n- Broker details (complete broker information, search)\n- Health check and utility endpoints\n\nBase URL: http://192.168.119.183:8758/api/v1\n\nFeatures:\n- Pagination support\n- Search and filtering\n- Comprehensive error handling\n- JSON responses\n- MongoDB backend\n\nCreated: December 26, 2025\nVersion: 1.0.0",
+    "description": "Complete API collection for NSE Broker Management System\n\nThis collection contains all REST API endpoints for managing NSE broker data including:\n- Dashboard operations (broker list, stats, filters)\n- Analytics data (broker analytics, top brokers)\n- Broker details (complete broker information, search)\n- Auth Person data (authorized persons for brokers)\n- Branch Office data (dealing offices for brokers)\n- Health check and utility endpoints\n\nBase URL: http://192.168.119.183:8758/api/v1\n\nFeatures:\n- Pagination support\n- Search and filtering\n- Comprehensive error handling\n- JSON responses\n- MongoDB backend\n\nCreated: December 26, 2025\nUpdated: December 29, 2025\nVersion: 2.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "variable": [
     {
@@ -13,15 +13,27 @@
     },
     {
       "key": "member_code",
-      "value": "13906",
+      "value": "14300",
       "type": "string",
-      "description": "Sample member code for testing (ZERODHA)"
+      "description": "Sample member code for testing (5PAISA CAPITAL LIMITED)"
+    },
+    {
+      "key": "mem_id",
+      "value": "2556", 
+      "type": "string",
+      "description": "Sample mem_id for testing (5PAISA CAPITAL LIMITED)"
     },
     {
       "key": "search_query",
-      "value": "ZERODHA",
+      "value": "5PAISA",
       "type": "string",
       "description": "Sample search query"
+    },
+    {
+      "key": "city_filter",
+      "value": "MUMBAI",
+      "type": "string", 
+      "description": "Sample city filter"
     }
   ],
   "item": [
@@ -410,6 +422,324 @@
               "body": "{\n  \"success\": false,\n  \"error\": \"Search query 'q' is required\"\n}"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Auth Person Endpoints",
+      "description": "Endpoints for broker authorized person data - get auth person info, search, and statistics",
+      "item": [
+        {
+          "name": "Get Auth Person by Member Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/brokers/{{member_code}}/auth-persons",
+              "host": ["{{base_url}}"],
+              "path": ["brokers", "{{member_code}}", "auth-persons"]
+            },
+            "description": "Get authorized person data for a specific broker by member code\n\n**Path Parameters:**\n- `member_code`: Broker's unique member code\n\n**Response:** Complete authorized person data including all auth persons for the broker"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brokers/90001/auth-persons",
+                  "host": ["{{base_url}}"],
+                  "path": ["brokers", "90001", "auth-persons"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {"key": "Content-Type", "value": "application/json"}
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"broker_name\": \"ANGEL ONE LIMITED\",\n    \"mem_id\": \"397\",\n    \"member_code\": \"90001\",\n    \"authorized_persons\": [\n      {\n        \"sr.no\": \"1\",\n        \"authorised_person_name\": \"JOHN DOE\",\n        \"authorized_person_trade_name\": \"DOE TRADING\",\n        \"registration_no.\": \"INZ000123456\",\n        \"registration_date\": \"01-Jan-2020\",\n        \"number_of_terminals\": \"5\",\n        \"type_of_entity\": \"Individual\",\n        \"ap_contact_person_name\": \"JOHN DOE\",\n        \"ap_email_id\": \"john@example.com\",\n        \"contact_no\": \"9876543210\",\n        \"traded_segments\": \"EQUITY, FO\",\n        \"status\": \"ACTIVE\",\n        \"address\": \"123 Main Street\",\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"pincode\": \"400001\"\n      }\n    ]\n  },\n  \"total_auth_persons\": 1,\n  \"message\": \"Successfully retrieved auth person data for ANGEL ONE LIMITED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Auth Person by Mem ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/brokers/mem-id/{{mem_id}}/auth-persons",
+              "host": ["{{base_url}}"],
+              "path": ["brokers", "mem-id", "{{mem_id}}", "auth-persons"]
+            },
+            "description": "Get authorized person data for a specific broker by mem_id (internal ID)\n\n**Path Parameters:**\n- `mem_id`: Broker's internal mem_id\n\n**Response:** Complete authorized person data including all auth persons for the broker"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Auth Persons (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth-persons?page=1&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["auth-persons"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Records per page (default: 50)"
+                }
+              ]
+            },
+            "description": "Get paginated list of all authorized person data\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Records per page (default: 50)\n\n**Response:** Paginated list of all auth person data with pagination metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Auth Persons",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth-persons/search?q={{search_query}}&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["auth-persons", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{search_query}}",
+                  "description": "Search term (required)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Maximum results (default: 20)"
+                }
+              ]
+            },
+            "description": "Search authorized person data by broker name or auth person name\n\n**Query Parameters:**\n- `q`: Search query (required)\n- `limit`: Maximum results (default: 20)\n\n**Response:** List of matching auth person records"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Auth Person Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth-persons/statistics",
+              "host": ["{{base_url}}"],
+              "path": ["auth-persons", "statistics"]
+            },
+            "description": "Get statistics about authorized person data\n\n**Response:** Statistics including total auth persons, average per broker, etc."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Branch Office Endpoints", 
+      "description": "Endpoints for broker branch/dealing office data - get branch info, search by city, and statistics",
+      "item": [
+        {
+          "name": "Get Branch by Member Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/brokers/{{member_code}}/branches",
+              "host": ["{{base_url}}"],
+              "path": ["brokers", "{{member_code}}", "branches"]
+            },
+            "description": "Get dealing office data for a specific broker by member code\n\n**Path Parameters:**\n- `member_code`: Broker's unique member code\n\n**Response:** Complete branch office data including all dealing offices for the broker"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brokers/14300/branches",
+                  "host": ["{{base_url}}"],
+                  "path": ["brokers", "14300", "branches"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {"key": "Content-Type", "value": "application/json"}
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"broker_name\": \"5PAISA CAPITAL LIMITED\",\n    \"mem_id\": \"2556\",\n    \"member_code\": \"14300\",\n    \"offices\": [\n      {\n        \"sr_no\": \"1.\",\n        \"office_type\": \"BRANCH OFFICE\",\n        \"contact_person_name\": \"DEEPAK SHARMA\",\n        \"address\": \"5PAISA CAPITAL LIMITED, SUN INFOTECH PARK1ST FLOOR, ROAD NO 16V, B-23, MIDCTHANE INDUSTRIAL AREA , WAGLE ESTATE, THANE,THANE-400604\",\n        \"city\": \"THANE\",\n        \"state\": \"MAHARASHTRA\",\n        \"pincode\": \"400604\"\n      },\n      {\n        \"sr_no\": \"2.\",\n        \"office_type\": \"BRANCH OFFICE\",\n        \"contact_person_name\": \"Deepak Sharma\",\n        \"address\": \"NETMAGIC IT SERVICES PVT LTD,, MEHARA INDUSTRIAL ESTATE,ASHA USHA COMPOUND,LBS MARG, VIKROLI (W),,MUMBAI-400079\",\n        \"city\": \"MUMBAI\",\n        \"state\": \"MAHARASHTRA\",\n        \"pincode\": \"400079\"\n      }\n    ]\n  },\n  \"total_offices\": 13,\n  \"message\": \"Successfully retrieved branch data for 5PAISA CAPITAL LIMITED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Branch by Mem ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/brokers/mem-id/{{mem_id}}/branches",
+              "host": ["{{base_url}}"],
+              "path": ["brokers", "mem-id", "{{mem_id}}", "branches"]
+            },
+            "description": "Get dealing office data for a specific broker by mem_id (internal ID)\n\n**Path Parameters:**\n- `mem_id`: Broker's internal mem_id\n\n**Response:** Complete branch office data including all dealing offices for the broker"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Branches (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches?page=1&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["branches"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Records per page (default: 50)"
+                }
+              ]
+            },
+            "description": "Get paginated list of all dealing office data\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Records per page (default: 50)\n\n**Response:** Paginated list of all branch office data with pagination metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Branches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/search?q={{search_query}}&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["branches", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{search_query}}",
+                  "description": "Search term (required)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Maximum results (default: 20)"
+                }
+              ]
+            },
+            "description": "Search dealing office data by broker name, office type, city, or contact person\n\n**Query Parameters:**\n- `q`: Search query (required)\n- `limit`: Maximum results (default: 20)\n\n**Response:** List of matching branch office records"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Branches by City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/city/{{city_filter}}?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["branches", "city", "{{city_filter}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Maximum results (default: 50)"
+                }
+              ]
+            },
+            "description": "Get dealing offices filtered by city\n\n**Path Parameters:**\n- `city`: City name\n\n**Query Parameters:**\n- `limit`: Maximum results (default: 50)\n\n**Response:** Branch office data for the specified city"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Branch Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/statistics",
+              "host": ["{{base_url}}"],
+              "path": ["branches", "statistics"]
+            },
+            "description": "Get statistics about dealing office data\n\n**Response:** Statistics including total offices, cities, states, office types, etc."
+          },
+          "response": []
         }
       ]
     },

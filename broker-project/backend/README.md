@@ -219,6 +219,191 @@ GET /api/v1/brokers/search?q=ZERODHA&limit=20
 
 ---
 
+### Auth Person Endpoints - Authorized Person Data
+
+#### Get Auth Person by Member Code
+```
+GET /api/v1/brokers/{member_code}/auth-persons
+```
+
+**Path Parameters:**
+- `member_code` (string, required): Broker's unique member code
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "broker_name": "ANGEL ONE LIMITED",
+    "mem_id": "397",
+    "member_code": "90001",
+    "authorized_persons": [
+      {
+        "sr.no": "1",
+        "authorised_person_name": "JOHN DOE",
+        "authorized_person_trade_name": "DOE TRADING",
+        "registration_no.": "INZ000123456",
+        "registration_date": "01-Jan-2020",
+        "number_of_terminals": "5",
+        "type_of_entity": "Individual",
+        "ap_contact_person_name": "JOHN DOE",
+        "ap_email_id": "john@example.com",
+        "contact_no": "9876543210",
+        "traded_segments": "EQUITY, FO",
+        "status": "ACTIVE",
+        "address": "123 Main Street",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      }
+    ]
+  },
+  "total_auth_persons": 1,
+  "message": "Successfully retrieved auth person data"
+}
+```
+
+#### Get Auth Person by Mem ID
+```
+GET /api/v1/brokers/mem-id/{mem_id}/auth-persons
+```
+
+**Path Parameters:**
+- `mem_id` (string, required): Broker's internal mem_id
+
+#### Get All Auth Persons (Paginated)
+```
+GET /api/v1/auth-persons?page=1&limit=50
+```
+
+**Query Parameters:**
+- `page` (int, optional): Page number (default: 1)
+- `limit` (int, optional): Records per page (default: 50)
+
+#### Search Auth Persons
+```
+GET /api/v1/auth-persons/search?q=ZERODHA&limit=20
+```
+
+**Query Parameters:**
+- `q` (string, required): Search query (broker name, auth person name, etc.)
+- `limit` (int, optional): Maximum results (default: 20)
+
+#### Get Auth Person Statistics
+```
+GET /api/v1/auth-persons/statistics
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "total_brokers_with_auth_data": 150,
+    "total_authorized_persons": 450,
+    "avg_auth_persons_per_broker": 3.0,
+    "max_auth_persons_per_broker": 15,
+    "min_auth_persons_per_broker": 1
+  }
+}
+```
+
+---
+
+### Branch Office Endpoints - Dealing Office Data
+
+#### Get Branch by Member Code
+```
+GET /api/v1/brokers/{member_code}/branches
+```
+
+**Path Parameters:**
+- `member_code` (string, required): Broker's unique member code
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "broker_name": "ANGEL ONE LIMITED",
+    "mem_id": "397", 
+    "member_code": "90001",
+    "offices": [
+      {
+        "sr.no": "1",
+        "office_type": "REGISTERED OFFICE",
+        "contact_person_name": "JANE SMITH",
+        "address": "601, CJ Tower, Netaji Subhash Place",
+        "city": "NEW DELHI",
+        "state": "DELHI",
+        "pincode": "110034"
+      }
+    ]
+  },
+  "total_offices": 1,
+  "message": "Successfully retrieved branch data"
+}
+```
+
+#### Get Branch by Mem ID
+```
+GET /api/v1/brokers/mem-id/{mem_id}/branches
+```
+
+**Path Parameters:**
+- `mem_id` (string, required): Broker's internal mem_id
+
+#### Get All Branches (Paginated)
+```
+GET /api/v1/branches?page=1&limit=50
+```
+
+**Query Parameters:**
+- `page` (int, optional): Page number (default: 1)
+- `limit` (int, optional): Records per page (default: 50)
+
+#### Search Branches
+```
+GET /api/v1/branches/search?q=MUMBAI&limit=20
+```
+
+**Query Parameters:**
+- `q` (string, required): Search query (broker name, city, office type, etc.)
+- `limit` (int, optional): Maximum results (default: 20)
+
+#### Get Branches by City
+```
+GET /api/v1/branches/city/{city}?limit=50
+```
+
+**Path Parameters:**
+- `city` (string, required): City name
+
+**Query Parameters:**
+- `limit` (int, optional): Maximum results (default: 50)
+
+#### Get Branch Statistics
+```
+GET /api/v1/branches/statistics
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "total_brokers_with_branch_data": 200,
+    "total_dealing_offices": 800,
+    "unique_cities": 95,
+    "unique_states": 28,
+    "office_types": ["REGISTERED OFFICE", "BRANCH OFFICE", "SUB OFFICE"],
+    "brokers_with_offices": 200
+  }
+}
+```
+
+---
+
 ### Utility Endpoints
 
 #### Health Check

@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'http://192.168.119.183:8755/api/v1';
+const API_BASE_URL = 'http://192.168.119.183:8758/api/v1';
 
 // Get member code from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -184,16 +184,22 @@ function displaySegmentStatus(broker) {
 function displayOtherDetails(broker) {
     const outerDetails = broker.Outer_Details || {};
     
-    // AP List
+    // AP List - Make it clickable to redirect to authorized persons table
     const apList = outerDetails['List of APs registered'];
     if (apList && apList.text) {
-        document.getElementById('apList').innerHTML = `<a href="#" class="info-link">${apList.text}</a>`;
+        document.getElementById('apList').innerHTML = `<a href="#" class="info-link" onclick="viewAuthorizedPersons()">${apList.text}</a>`;
+    } else {
+        // Fallback if no text available
+        document.getElementById('apList').innerHTML = `<a href="#" class="info-link" onclick="viewAuthorizedPersons()">View Authorized Persons</a>`;
     }
     
-    // Dealing Offices
+    // Dealing Offices - Make it clickable to redirect to dealing offices table
     const dealingOffices = outerDetails['List of dealing offices'];
     if (dealingOffices && dealingOffices.text) {
-        document.getElementById('dealingOffices').innerHTML = `<a href="#" class="info-link">${dealingOffices.text}</a>`;
+        document.getElementById('dealingOffices').innerHTML = `<a href="#" class="info-link" onclick="viewDealingOffices()">${dealingOffices.text}</a>`;
+    } else {
+        // Fallback if no text available
+        document.getElementById('dealingOffices').innerHTML = `<a href="#" class="info-link" onclick="viewDealingOffices()">View Dealing Offices</a>`;
     }
     
     setText('isListed', outerDetails['Listed'] || '-');
@@ -835,4 +841,15 @@ function showError(message) {
     detailsContent.style.display = 'none';
     errorMessage.style.display = 'block';
     errorText.textContent = message;
+}
+
+// ============ Navigation Functions ============
+function viewAuthorizedPersons() {
+    // Redirect to authorized persons table page with member code
+    window.location.href = `authorized-persons.html?memberCode=${memberCode}`;
+}
+
+function viewDealingOffices() {
+    // Redirect to dealing offices table page with member code  
+    window.location.href = `dealing-offices.html?memberCode=${memberCode}`;
 }

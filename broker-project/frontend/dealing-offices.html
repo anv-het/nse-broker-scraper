@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealing Offices - NSE Broker Directory</title>
+    <link rel="stylesheet" href="src/styles.css?v=3">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+    <style>
+        /* Additional styles for branch offices table page */
+        .branch-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .branch-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .branch-header .broker-info {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .filter-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .filter-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #764ba2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-summary {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .branch-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .branch-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .branch-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .branch-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            vertical-align: top;
+            color: #1f2937;
+        }
+        
+        .branch-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .office-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .office-branch {
+            background-color: #ddd6fe;
+            color: #6b46c1;
+        }
+        
+        .office-head {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .office-regional {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .contact-info {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .location-info {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .location-city {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pagination-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #1f2937;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .branch-table {
+                font-size: 0.85rem;
+            }
+            
+            .branch-table th,
+            .branch-table td {
+                padding: 10px 12px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .branch-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Table responsive scroll */
+        .table-scroll-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .export-btn {
+            padding: 12px 24px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <button onclick="goBack()" class="btn-back">← Back to Broker Details</button>
+                <h1>🏢 Dealing Offices</h1>
+            </div>
+        </header>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading dealing offices data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <p id="errorText"></p>
+            <button onclick="goBack()" class="btn btn-primary" style="margin-top: 15px;">← Go Back</button>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" style="display: none;">
+            <!-- Broker Info Header -->
+            <div class="branch-header">
+                <h1 id="brokerName">Loading...</h1>
+                <div class="broker-info">
+                    <span id="memberCode">-</span> | 
+                    <span id="totalOffices">-</span> Dealing Offices
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalBranches">-</span>
+                    <div class="stat-label">Total Offices</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalCities">-</span>
+                    <div class="stat-label">Cities</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalStates">-</span>
+                    <div class="stat-label">States</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="branchOffices">-</span>
+                    <div class="stat-label">Branch Offices</div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search by Contact/Address:</label>
+                        <input type="text" id="searchText" class="filter-input" placeholder="Enter contact person or address...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by City:</label>
+                        <select id="cityFilter" class="filter-input">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by State:</label>
+                        <select id="stateFilter" class="filter-input">
+                            <option value="">All States</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Filter by Office Type:</label>
+                        <select id="typeFilter" class="filter-input">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button onclick="applyFilters()" class="filter-button">Apply Filters</button>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button onclick="clearFilters()" class="filter-button" style="background: #6c757d;">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="export-buttons">
+                <button onclick="exportToCSV()" class="export-btn">📊 Export to CSV</button>
+                <button onclick="exportToJSON()" class="export-btn">📄 Export to JSON</button>
+            </div>
+
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <strong>Results:</strong> Showing <span id="resultCount">-</span> of <span id="totalCount">-</span> dealing offices
+            </div>
+
+            <!-- Table Container -->
+            <div class="branch-table-container">
+                <div class="table-scroll-container">
+                    <table class="branch-table" id="branchTable">
+                        <thead>
+                            <tr>
+                                <th>Sr. No</th>
+                                <th>Office Type</th>
+                                <th>Contact Person</th>
+                                <th>Address</th>
+                                <th>Location</th>
+                                <th>Pincode</th>
+                            </tr>
+                        </thead>
+                        <tbody id="branchTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfo">
+                        Page 1 of 1 (0 records)
+                    </div>
+                    <div class="pagination-controls" id="paginationControls">
+                        <button class="pagination-btn" onclick="previousPage()" id="prevBtn" disabled>Previous</button>
+                        <button class="pagination-btn" onclick="nextPage()" id="nextBtn" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let memberCode = '';
+        let brokerData = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get member code from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            memberCode = urlParams.get('memberCode');
+            
+            if (!memberCode) {
+                showError('No member code provided');
+                return;
+            }
+            
+            loadDealingOffices();
+        });
+
+        // Load dealing offices data
+        async function loadDealingOffices() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`http://192.168.119.183:8758/api/v1/brokers/${memberCode}/branches`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load data');
+                }
+                
+                brokerData = result.data;
+                currentData = brokerData.offices || [];
+                filteredData = [...currentData];
+                
+                displayBrokerInfo();
+                displayStats();
+                populateFilters();
+                displayTable();
+                
+                showLoading(false);
+                document.getElementById('mainContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load dealing offices data: ' + error.message);
+                showLoading(false);
+            }
+        }
+
+        // Display broker information
+        function displayBrokerInfo() {
+            document.getElementById('brokerName').textContent = brokerData.broker_name || 'Unknown Broker';
+            document.getElementById('memberCode').textContent = `Member Code: ${brokerData.member_code}`;
+            document.getElementById('totalOffices').textContent = `${currentData.length}`;
+        }
+
+        // Display statistics
+        function displayStats() {
+            const cities = [...new Set(currentData.map(office => office.city).filter(city => city))];
+            const states = [...new Set(currentData.map(office => office.state).filter(state => state))];
+            const branchOffices = currentData.filter(office => 
+                office.office_type && office.office_type.toLowerCase().includes('branch')
+            );
+            
+            document.getElementById('totalBranches').textContent = currentData.length;
+            document.getElementById('totalCities').textContent = cities.length;
+            document.getElementById('totalStates').textContent = states.length;
+            document.getElementById('branchOffices').textContent = branchOffices.length;
+        }
+
+        // Populate filter options
+        function populateFilters() {
+            const cities = [...new Set(currentData.map(office => office.city).filter(city => city))].sort();
+            const states = [...new Set(currentData.map(office => office.state).filter(state => state))].sort();
+            const types = [...new Set(currentData.map(office => office.office_type).filter(type => type))].sort();
+            
+            const citySelect = document.getElementById('cityFilter');
+            const stateSelect = document.getElementById('stateFilter');
+            const typeSelect = document.getElementById('typeFilter');
+            
+            citySelect.innerHTML = '<option value="">All Cities</option>';
+            stateSelect.innerHTML = '<option value="">All States</option>';
+            typeSelect.innerHTML = '<option value="">All Types</option>';
+            
+            cities.forEach(city => {
+                citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+            });
+            
+            states.forEach(state => {
+                stateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+            });
+            
+            types.forEach(type => {
+                typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchText = document.getElementById('searchText').value.toLowerCase();
+            const cityFilter = document.getElementById('cityFilter').value;
+            const stateFilter = document.getElementById('stateFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            filteredData = currentData.filter(office => {
+                const textMatch = !searchText || 
+                    office.contact_person_name.toLowerCase().includes(searchText) ||
+                    office.address.toLowerCase().includes(searchText);
+                
+                const cityMatch = !cityFilter || office.city === cityFilter;
+                const stateMatch = !stateFilter || office.state === stateFilter;
+                const typeMatch = !typeFilter || office.office_type === typeFilter;
+                
+                return textMatch && cityMatch && stateMatch && typeMatch;
+            });
+            
+            currentPage = 1;
+            displayTable();
+            displayStats(); // Update stats for filtered data
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('searchText').value = '';
+            document.getElementById('cityFilter').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            
+            filteredData = [...currentData];
+            currentPage = 1;
+            displayTable();
+            displayStats();
+        }
+
+        // Display table data
+        function displayTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            const tbody = document.getElementById('branchTableBody');
+            tbody.innerHTML = '';
+            
+            pageData.forEach((office, index) => {
+                const row = document.createElement('tr');
+                
+                // Determine office type badge class
+                let officeTypeClass = 'office-branch';
+                if (office.office_type && office.office_type.toLowerCase().includes('head')) {
+                    officeTypeClass = 'office-head';
+                } else if (office.office_type && office.office_type.toLowerCase().includes('regional')) {
+                    officeTypeClass = 'office-regional';
+                }
+                
+                row.innerHTML = `
+                    <td>${office.sr_no}</td>
+                    <td><span class="office-type-badge ${officeTypeClass}">${office.office_type}</span></td>
+                    <td class="contact-info"><strong>${office.contact_person_name}</strong></td>
+                    <td>${office.address}</td>
+                    <td class="location-info">
+                        <span class="location-city">${office.city}</span><br>
+                        ${office.state}
+                    </td>
+                    <td>${office.pincode}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            updateResultsInfo();
+            updatePagination();
+        }
+
+        // Update results summary
+        function updateResultsInfo() {
+            document.getElementById('resultCount').textContent = filteredData.length;
+            document.getElementById('totalCount').textContent = currentData.length;
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const startRecord = ((currentPage - 1) * itemsPerPage) + 1;
+            const endRecord = Math.min(currentPage * itemsPerPage, filteredData.length);
+            
+            document.getElementById('paginationInfo').textContent = 
+                `Page ${currentPage} of ${totalPages} (${startRecord}-${endRecord} of ${filteredData.length} records)`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        // Pagination functions
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayTable();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayTable();
+            }
+        }
+
+        // Export functions
+        function exportToCSV() {
+            const headers = ['Sr_No', 'Office_Type', 'Contact_Person', 'Address', 'City', 'State', 'Pincode'];
+            
+            const csvData = filteredData.map(office => [
+                office.sr_no,
+                office.office_type,
+                office.contact_person_name,
+                office.address.replace(/,/g, ';'), // Replace commas to avoid CSV issues
+                office.city,
+                office.state,
+                office.pincode
+            ]);
+            
+            const csvContent = [headers.join(','), ...csvData.map(row => row.join(','))].join('\n');
+            downloadFile(csvContent, `dealing_offices_${memberCode}.csv`, 'text/csv');
+        }
+
+        function exportToJSON() {
+            const jsonContent = JSON.stringify({
+                broker_name: brokerData.broker_name,
+                member_code: brokerData.member_code,
+                total_count: filteredData.length,
+                dealing_offices: filteredData
+            }, null, 2);
+            
+            downloadFile(jsonContent, `dealing_offices_${memberCode}.json`, 'application/json');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'flex' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function goBack() {
+            // Try to go back in browser history
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback to details page
+                window.location.href = `details.html?member_code=${memberCode}`;
+            }
+        }
+
+        // Add search on Enter key
+        document.getElementById('searchText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>

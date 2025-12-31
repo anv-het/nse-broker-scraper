@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSE Broker Navigation Test</title>
+    <link rel="stylesheet" href="src/styles.css?v=3">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>🧪 Navigation Test</h1>
+                <p>Test the new authorized persons and dealing offices pages</p>
+            </div>
+        </header>
+
+        <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h2>Test 5PAISA CAPITAL LIMITED (Member Code: 14300)</h2>
+            
+            <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+                <button onclick="location.href='details.html?code=14300'" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;" 
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    📋 View Broker Details
+                </button>
+                
+                <button onclick="location.href='authorized-persons.html?memberCode=14300'" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    👥 View Authorized Persons
+                </button>
+                
+                <button onclick="location.href='dealing-offices.html?memberCode=14300'" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    🏢 View Dealing Offices
+                </button>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>How to Test:</h3>
+                <ol>
+                    <li>Click <strong>"View Broker Details"</strong> to see the main broker page</li>
+                    <li>On the broker details page, scroll down to "Other Details" section</li>
+                    <li>Click on <strong>"LIST OF APs REGISTERED"</strong> link - should open authorized persons table</li>
+                    <li>Click on <strong>"LIST OF DEALING OFFICES"</strong> link - should open dealing offices table</li>
+                    <li>Test filtering, pagination, and export functionality on both table pages</li>
+                    <li>Use the "Back to Broker Details" button to navigate back</li>
+                </ol>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>Expected Features:</h3>
+                <ul>
+                    <li><strong>Authorized Persons Table:</strong> Name, trade name, registration details, contact info, location, segments, status</li>
+                    <li><strong>Dealing Offices Table:</strong> Office type, contact person, address, location, pincode</li>
+                    <li><strong>Filtering:</strong> Search by name/text, filter by city/state/status/type</li>
+                    <li><strong>Pagination:</strong> 20 records per page with navigation controls</li>
+                    <li><strong>Export:</strong> CSV and JSON export functionality</li>
+                    <li><strong>Responsive:</strong> Works on mobile devices</li>
+                </ul>
+            </div>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>API Endpoints Used:</h3>
+                <ul>
+                    <li><code>GET /api/v1/brokers/14300/auth-persons</code> - Authorized persons data</li>
+                    <li><code>GET /api/v1/brokers/14300/branches</code> - Dealing offices data</li>
+                </ul>
+                <p><strong>Server:</strong> http://192.168.119.183:8758</p>
+                <p><strong>Frontend:</strong> http://localhost:8080</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
