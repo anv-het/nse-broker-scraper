@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'http://192.168.119.183:8758/api/v1';
+const API_BASE_URL = 'http://192.168.119.183:8755/api/v1';
 
 // Get member code from URL
 const urlParams = new URLSearchParams(window.location.search);

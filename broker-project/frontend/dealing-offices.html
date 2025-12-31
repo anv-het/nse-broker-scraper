@@ -8,6 +8,10 @@
     <link rel="icon" type="image/png" href="public/favicon.png">
     <style>
         /* Additional styles for branch offices table page */
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            padding: 15px;
+        }
         .branch-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -27,6 +31,7 @@
             font-size: 14px;
             opacity: 0.9;
         }
+
         
         .filters-section {
             background: white;
@@ -108,17 +113,18 @@
         }
         
         .branch-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
-            padding: 16px;
+            padding: 12px 14px;
             text-align: left;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.813rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: sticky;
             top: 0;
             z-index: 10;
+            white-space: nowrap;
         }
         
         .branch-table td {
@@ -253,7 +259,6 @@
         
         /* Table responsive scroll */
         .table-scroll-container {
-            max-height: 70vh;
             overflow-y: auto;
         }
         
@@ -309,6 +314,13 @@
             display: block;
             margin-bottom: 8px;
         }
+
+        .container {
+            max-width: 100%;
+            height: calc(100vh - 30px);
+            display: flex;
+            flex-direction: column;
+        }
         
         .stat-label {
             font-size: 0.85rem;
@@ -316,6 +328,36 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
+        }
+        .ap-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .ap-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .ap-header .broker-info {
+            margin-top: 5px;
+            font-size: 0.875rem;
+            opacity: 0.95;
+        }
+        
+        .filters-section {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -480,7 +522,7 @@
             try {
                 showLoading(true);
                 
-                const response = await fetch(`http://192.168.119.183:8758/api/v1/brokers/${memberCode}/branches`);
+                const response = await fetch(`http://192.168.119.183:8755/api/v1/brokers/${memberCode}/branches`);
                 const result = await response.json();
                 
                 if (!result.success) {

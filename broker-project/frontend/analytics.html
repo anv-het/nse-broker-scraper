@@ -5,7 +5,345 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NSE Broker Analytics Dashboard</title>
     <link rel="stylesheet" href="src/styles.css">
+    <link rel="stylesheet" href="src/animations.css">
     <link rel="icon" type="image/png" href="public/favicon.png">
+    <style>
+        /* Page-specific styles - Authorized Persons */
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ap-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .ap-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .ap-header .broker-info {
+            margin-top: 5px;
+            font-size: 0.875rem;
+            opacity: 0.95;
+        }
+        
+        .filters-section {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #374151;
+            font-size: 0.813rem;
+        }
+        
+        .filter-input {
+            padding: 8px 12px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: white;
+        }
+        
+        .filter-button {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-button:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-summary {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.875rem;
+            color: #1e40af;
+            flex-shrink: 0;
+        }
+        
+        .ap-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .table-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        
+        .ap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .ap-table th {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        
+        .ap-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+            color: #374151;
+        }
+        
+        .ap-table tbody tr:hover {
+            background-color: #faf5ff;
+            transition: background-color 0.15s ease;
+        }
+        
+        .ap-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        .ap-table tbody tr:nth-child(even):hover {
+            background-color: #faf5ff;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .segments-list {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .entity-type {
+            background: linear-gradient(135deg, #e9d5ff 0%, #ddd6fe 100%);
+            color: #6b21a8;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .contact-info {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .contact-email {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-email:hover {
+            text-decoration: underline;
+            color: #7c3aed;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #374151;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+            background: #faf5ff;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border-color: #8b5cf6;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                height: calc(100vh - 20px);
+            }
+            
+            .ap-table {
+                font-size: 0.75rem;
+            }
+            
+            .ap-table th,
+            .ap-table td {
+                padding: 8px 10px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .ap-header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        
+        .export-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .export-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        #mainContent {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -104,43 +442,54 @@
             <span id="errorText"></span>
         </div>
 
-        <!-- Analytics Table -->
-        <div id="tableContainer" class="table-container d-none">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th onclick="sortByColumn('sr_no')" style="cursor: pointer;">
-                            Sr No <span id="sort-sr_no">↕️</span>
-                        </th>
-                        <th onclick="sortByColumn('member_name')" style="cursor: pointer;">
-                            Broker Name <span id="sort-member_name">↕️</span>
-                        </th>
-                        <th onclick="sortByColumn('active_clients')" style="cursor: pointer;">
-                            Active Clients <span id="sort-active_clients">↕️</span>
-                        </th>
-                        <th onclick="sortByColumn('city')" style="cursor: pointer;">
-                            City <span id="sort-city">↕️</span>
-                        </th>
-                        <th>Website</th>
-                        <th>CEO Name</th>
-                        <th>Compliance Officer</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="analyticsTableBody">
-                    <!-- Data will be populated here -->
-                </tbody>
-            </table>
-        </div>
 
-        <!-- Results Info -->
-        <div id="resultsInfo" class="text-center mt-2 d-none">
-            <p class="text-secondary">
-                Showing <strong id="resultsCount">0</strong> brokers
-            </p>
-        </div>
     </div>
 
+    <div>
+
+                <!-- Analytics Table -->
+        <div id="tableContainer" class="ap-table-container">
+            <div class="table-scroll-container">
+                <table class="ap-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortByColumn('sr_no')" style="cursor: pointer;">
+                                Sr No <span id="sort-sr_no">↕️</span>
+                            </th>
+                            <th onclick="sortByColumn('member_name')" style="cursor: pointer;">
+                                Broker Name <span id="sort-member_name">↕️</span>
+                            </th>
+                            <th onclick="sortByColumn('active_clients')" style="cursor: pointer;">
+                                Active Clients <span id="sort-active_clients">↓</span>
+                            </th>
+                            <th onclick="sortByColumn('city')" style="cursor: pointer;">
+                                City <span id="sort-city">↕️</span>
+                            </th>
+                            <th>Website</th>
+                            <th>CEO Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analyticsTableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info" id="paginationInfo">
+                    Page 1 of 1 (0-0 of 0 brokers)
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" onclick="previousPage()" id="prevBtn" disabled>Previous</button>
+                    <button class="pagination-btn" onclick="nextPage()" id="nextBtn" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="src/config.js"></script>
     <script src="src/pages/AnalyticsDashboard.js"></script>
 </body>
 </html>

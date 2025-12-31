@@ -34,9 +34,18 @@ Modern, professional frontend application for managing and analyzing NSE (Nation
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Backend server running on `http://192.168.119.183:8758`
+- Backend server running on `http://192.168.119.183:8755`
 - Modern web browser (Chrome, Firefox, Edge, Safari)
 - No additional dependencies required
+
+### Configuration
+
+The frontend configuration is managed in `src/config.js`. To change settings:
+
+- **Frontend Port**: Modify `CONFIG.FRONTEND.PORT` and `CONFIG.FRONTEND.HOST`
+- **Backend URL**: Update `CONFIG.BACKEND.BASE_URL` and `CONFIG.BACKEND.API_BASE_URL`
+- **Feature Flags**: Change values in `CONFIG.FEATURES`
+- **UI Settings**: Modify values in `CONFIG.UI`
 
 ### Installation
 
@@ -46,6 +55,7 @@ Modern, professional frontend application for managing and analyzing NSE (Nation
    cd broker-project\backend
    python run_server.py
    ```
+   Backend should be accessible at `http://192.168.119.183:8755`
 
 2. **Open Frontend**:
    - Simply open `index.html` in your web browser

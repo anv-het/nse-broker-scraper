@@ -11,6 +11,8 @@ const API_BASE_URL = 'http://192.168.119.183:8755/api/v1';
 let allBrokers = [];
 let filteredBrokers = [];
 let currentSort = { by: 'active_clients', order: 'desc' };
+let currentPage = 1;
+let itemsPerPage = 50;
 
 // DOM Elements
 const loadingSpinner = document.getElementById('loadingSpinner');
@@ -18,8 +20,6 @@ const errorMessage = document.getElementById('errorMessage');
 const errorText = document.getElementById('errorText');
 const tableContainer = document.getElementById('tableContainer');
 const analyticsTableBody = document.getElementById('analyticsTableBody');
-const resultsInfo = document.getElementById('resultsInfo');
-const resultsCount = document.getElementById('resultsCount');
 const searchInput = document.getElementById('searchInput');
 const sortBy = document.getElementById('sortBy');
 const sortOrder = document.getElementById('sortOrder');
@@ -103,8 +103,11 @@ function applyFilters() {
         return nameMatch || cityMatch || ceoMatch;
     });
     
-    // Sort brokers
+    // Sort brokers (applies to full dataset)
     sortBrokers();
+    
+    // Reset to first page when filters change
+    currentPage = 1;
     
     // Display results
     displayAnalytics();
@@ -157,16 +160,20 @@ function displayAnalytics() {
     if (filteredBrokers.length === 0) {
         analyticsTableBody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
                     No brokers found matching your criteria.
                 </td>
             </tr>
         `;
-        resultsInfo.classList.add('d-none');
         return;
     }
     
-    filteredBrokers.forEach(broker => {
+    // Pagination: Get current page data
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = filteredBrokers.slice(startIndex, endIndex);
+    
+    pageData.forEach(broker => {
         const row = document.createElement('tr');
         
         // Format website
@@ -192,20 +199,13 @@ function displayAnalytics() {
             <td>${escapeHtml(broker.city || '-')}</td>
             <td>${websiteHtml}</td>
             <td>${escapeHtml(broker.ceo_name || '-')}</td>
-            <td>${escapeHtml(broker.compliance_officer || '-')}</td>
-            <td>
-                <button class="btn btn-sm btn-primary" onclick="viewDetails('${broker.member_code}')">
-                    View Details
-                </button>
-            </td>
         `;
         
         analyticsTableBody.appendChild(row);
     });
     
-    // Update results count
-    resultsCount.textContent = formatNumber(filteredBrokers.length);
-    resultsInfo.classList.remove('d-none');
+    // Update pagination info
+    updatePaginationInfo();
     tableContainer.classList.remove('d-none');
 }
 
@@ -251,6 +251,48 @@ function updateSortIndicators() {
 }
 
 /**
+ * Update Pagination Info
+ */
+function updatePaginationInfo() {
+    const totalPages = Math.ceil(filteredBrokers.length / itemsPerPage);
+    const startRecord = ((currentPage - 1) * itemsPerPage) + 1;
+    const endRecord = Math.min(currentPage * itemsPerPage, filteredBrokers.length);
+    
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = 
+            `Page ${currentPage} of ${totalPages} (${startRecord}-${endRecord} of ${filteredBrokers.length} brokers)`;
+    }
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+}
+
+/**
+ * Previous Page
+ */
+function previousPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayAnalytics();
+    }
+}
+
+/**
+ * Next Page
+ */
+function nextPage() {
+    const totalPages = Math.ceil(filteredBrokers.length / itemsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        displayAnalytics();
+    }
+}
+
+/**
  * Clear Filters
  */
 function clearFilters() {
@@ -278,7 +320,6 @@ function showLoading(show) {
     if (show) {
         loadingSpinner.classList.remove('d-none');
         tableContainer.classList.add('d-none');
-        resultsInfo.classList.add('d-none');
     } else {
         loadingSpinner.classList.add('d-none');
     }
@@ -291,7 +332,6 @@ function showError(message) {
     errorText.textContent = message;
     errorMessage.classList.remove('d-none');
     tableContainer.classList.add('d-none');
-    resultsInfo.classList.add('d-none');
 }
 
 /**
@@ -324,5 +364,7 @@ window.applyFilters = applyFilters;
 window.clearFilters = clearFilters;
 window.viewDetails = viewDetails;
 window.sortByColumn = sortByColumn;
+window.previousPage = previousPage;
+window.nextPage = nextPage;
 
 console.log('✅ Analytics Dashboard script loaded');

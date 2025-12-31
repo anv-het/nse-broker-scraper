@@ -1,0 +1,442 @@
+/**
+ * Animations for NSE Broker Dashboard
+ * ====================================
+ * Smooth animations for all pages
+ */
+
+/* Fade In Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scale Animations */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Slide Animations */
+@keyframes slideDown {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 1000px;
+        opacity: 1;
+    }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Shimmer Loading Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Rotate Animation */
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Glow Animation */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+    }
+}
+
+/* Apply Animations to Elements */
+
+/* Header Animation */
+.header {
+    animation: fadeInDown 0.6s ease-out;
+}
+
+/* Stats Cards Animation */
+.stat-card {
+    animation: scaleIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Controls Section Animation */
+.controls-section {
+    animation: fadeInUp 0.6s ease-out 0.3s;
+    animation-fill-mode: both;
+}
+
+/* Table Animation */
+.table-container {
+    animation: fadeIn 0.6s ease-out 0.4s;
+    animation-fill-mode: both;
+}
+
+/* Table Row Animation */
+.table tbody tr {
+    animation: fadeInLeft 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+/* Button Hover Effects */
+.btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Card Hover Effects */
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+}
+
+/* Detail Card Animation */
+.detail-card {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.detail-card:nth-child(1) { animation-delay: 0.1s; }
+.detail-card:nth-child(2) { animation-delay: 0.2s; }
+.detail-card:nth-child(3) { animation-delay: 0.3s; }
+.detail-card:nth-child(4) { animation-delay: 0.4s; }
+.detail-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* Info Item Animation */
+.info-item {
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+/* Office Box Animation */
+.office-box {
+    animation: scaleIn 0.5s ease-out;
+    transition: all 0.3s ease;
+}
+
+.office-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Loading Spinner Animation */
+.spinner {
+    animation: rotate 1s linear infinite;
+}
+
+.loading-spinner {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Pagination Animation */
+.pagination {
+    animation: fadeInUp 0.5s ease-out 0.5s;
+    animation-fill-mode: both;
+}
+
+.pagination-btn {
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+/* Nav Tab Animation */
+.nav-tab {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-tab:hover::before {
+    left: 100%;
+}
+
+/* Form Input Focus Animation */
+.form-input,
+.form-select {
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    transform: scale(1.01);
+}
+
+/* Badge Animation */
+.status-badge,
+.office-type-badge,
+.entity-type {
+    animation: fadeIn 0.3s ease-out;
+    transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.1);
+}
+
+/* Management Box Animation */
+.management-box {
+    animation: fadeInRight 0.5s ease-out;
+    transition: all 0.3s ease;
+}
+
+.management-box:hover {
+    transform: translateX(5px);
+}
+
+/* SEBI Card Animation */
+.sebi-card {
+    animation: scaleIn 0.4s ease-out;
+    transition: all 0.3s ease;
+}
+
+.sebi-card:hover {
+    transform: translateY(-5px) rotate(1deg);
+}
+
+/* Table Header Sorting Animation */
+.table thead th {
+    transition: all 0.2s ease;
+}
+
+.table thead th:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+}
+
+/* Alert Animation */
+.alert {
+    animation: slideDown 0.4s ease-out;
+}
+
+/* Filter Button Animation */
+.filter-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-button:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Export Button Animation */
+.export-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.export-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.export-btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Smooth Scroll Behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Link Hover Animation */
+a {
+    transition: all 0.3s ease;
+}
+
+.broker-name-link {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.broker-name-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+}
+
+.broker-name-link:hover::after {
+    width: 100%;
+}
+
+/* Back to Top Button Animation */
+.back-to-top {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.back-to-top:hover {
+    animation: pulse 1s infinite;
+}
+
+/* Responsive Animation Adjustments */
+@media (max-width: 768px) {
+    /* Reduce animation complexity on mobile */
+    .stat-card,
+    .detail-card,
+    .table tbody tr {
+        animation-duration: 0.3s;
+    }
+    
+    /* Disable some hover effects on touch devices */
+    @media (hover: none) {
+        .stat-card:hover,
+        .office-box:hover,
+        .management-box:hover {
+            transform: none;
+        }
+    }
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
